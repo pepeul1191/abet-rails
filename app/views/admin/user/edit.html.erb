@@ -1,0 +1,54 @@
+<main class="main-content">
+  <div class="container-fluid">
+    <h3 class="mb-4">
+      <a href="/admin/master-data"><i class="fa fa-cc-mastercard me-2"></i>Gestión de Datos Maestros</a> / 
+      <a href="/admin/user">Usuarios</a> /
+      Editar Usuario
+    </h3>
+
+    <%= render 'partials/flash_messages' %>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Usuario: <%= @user.email %>
+        </h6>
+      </div>
+
+      <div class="card-body">
+        <form action="/admin/user/<%= @user.id %>" method="POST" class="row g-3">
+          <!-- Método PUT -->
+          <input type="hidden" name="_method" value="PUT">
+          <!-- CSRF token -->
+          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+          <div class="col-md-4">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" maxlength="40" 
+                   value="<%= @user.email %>" required>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="password" class="form-control" placeholder="Dejar vacío para no cambiar">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Confirmar Contraseña</label>
+            <input type="password" name="password_confirmation" class="form-control" placeholder="Dejar vacío para no cambiar">
+          </div>
+
+          <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>Guardar Cambios
+            </button>
+            <a href="/admin/user" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>Cancelar
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>

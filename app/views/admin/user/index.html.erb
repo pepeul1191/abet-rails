@@ -1,0 +1,169 @@
+<main class="main-content">
+  <div class="container-fluid">
+    <h3 class="mb-4">
+      <a href="/admin/master-data">
+        <i class="fa fa-cc-mastercard me-2"></i>Gestión de Datos Maestros
+      </a> / Usuarios
+    </h3>
+
+    <!-- Flash Messages -->
+    <% if flash[:notice] %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= flash[:notice] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= flash[:alert] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% end %>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-filter me-2"></i>
+          Filtros de Búsqueda
+        </h6>
+      </div>
+      <div class="card-body">
+        <form method="GET" action="/admin/user">
+          <input type="hidden" name="per_page" value="<%= @pagination[:per_page] %>">
+          <div class="row mb-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label">Email</label>
+              <input type="text" name="email" class="form-control"
+                     placeholder="Buscar por email..."
+                     value="<%= @search_query %>">
+            </div>
+            <div class="col-md-4">
+              <div class="input-group" style="padding-top: 8px;">
+                <button type="submit" class="btn btn-primary me-2">
+                  <i class="fa fa-search"></i> Buscar
+                </button>
+                <a href="/admin/user" class="btn btn-outline-secondary">
+                  <i class="fa fa-refresh"></i> Limpiar
+                </a>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-users me-2"></i>
+          Lista de Usuarios
+        </h6>
+      </div>
+
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center me-3">
+            <label class="form-label mb-0 me-2">Filas por página:</label>
+            <form method="GET" action="/admin/user">
+              <input type="hidden" name="email" value="<%= @search_query %>">
+              <select name="per_page" class="form-select" style="width: 120px;" onchange="this.form.submit()">
+                <% [5,10,25,50,100].each do |n| %>
+                  <option value="<%= n %>" <%= 'selected' if @pagination[:per_page] == n %>><%= n %></option>
+                <% end %>
+              </select>
+            </form>
+          </div>
+
+          <a href="/admin/user/new" class="btn btn-success">
+            <i class="fa fa-plus"></i> Agregar Usuario
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Fecha creación</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% if @users.any? %>
+                <% @users.each do |user| %>
+                  <tr>
+                    <td><%= user.email %></td>
+                    <td><%= user.created_at.strftime("%d/%m/%Y %H:%M") rescue "-" %></td>
+                    <td class="text-end btn-group-sm">
+                      <a href="/admin/user/<%= user.id %>/edit" class="btn btn-outline-secondary me-1">
+                        <i class="fa fa-edit"></i> Editar
+                      </a>
+                      <a href="/admin/user/<%= user.id %>/delete"
+                         class="btn btn-outline-danger"
+                         data-method="delete"
+                         onclick="return confirm('¿Eliminar este usuario?');">
+                        <i class="fa fa-trash"></i> Eliminar
+                      </a>
+                    </td>
+                  </tr>
+                <% end %>
+              <% else %>
+                <tr>
+                  <td colspan="3" class="text-center">
+                    No se encontraron usuarios.
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+
+            <% if @pagination[:total_pages] > 1 %>
+              <tfoot>
+                <tr>
+                  <td colspan="3">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                      <div class="text-muted">
+                        Página <%= @pagination[:page] %> de <%= @pagination[:total_pages] %> -
+                        Mostrando <%= @pagination[:start_record] %> - <%= @pagination[:end_record] %>
+                        de <%= @pagination[:total_users] %>
+                      </div>
+
+                      <ul class="pagination mb-0">
+                        <li class="page-item <%= 'disabled' if @pagination[:page] == 1 %>">
+                          <a class="page-link" href="/admin/user?page=1&per_page=<%= @pagination[:per_page] %>&email=<%= @search_query %>">
+                            « Primero
+                          </a>
+                        </li>
+
+                        <li class="page-item <%= 'disabled' if @pagination[:page] == 1 %>">
+                          <a class="page-link" href="/admin/user?page=<%= @pagination[:page] - 1 %>&per_page=<%= @pagination[:per_page] %>&email=<%= @search_query %>">
+                            ‹ Anterior
+                          </a>
+                        </li>
+
+                        <li class="page-item <%= 'disabled' if @pagination[:page] == @pagination[:total_pages] %>">
+                          <a class="page-link" href="/admin/user?page=<%= @pagination[:page] + 1 %>&per_page=<%= @pagination[:per_page] %>&email=<%= @search_query %>">
+                            Siguiente ›
+                          </a>
+                        </li>
+
+                        <li class="page-item <%= 'disabled' if @pagination[:page] == @pagination[:total_pages] %>">
+                          <a class="page-link" href="/admin/user?page=<%= @pagination[:total_pages] %>&per_page=<%= @pagination[:per_page] %>&email=<%= @search_query %>">
+                            Último »
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            <% end %>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

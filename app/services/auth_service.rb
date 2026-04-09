@@ -5,7 +5,34 @@ class AuthService < ApplicationService
   default_timeout 30
   headers 'Content-Type' => 'application/json', 'Accept' => 'application/json'
 
-  def self.login_by_username(username, password)
+  def self.simple_login(username, password)
+    admin_username = ENV['USERNAME']
+    admin_password = ENV['PASSWORD']
+
+    if admin_username.blank? || admin_password.blank?
+      return handle_error("admin credentials not configured")
+    end
+
+    if username == admin_username && password == admin_password
+      login_response = {
+        user: {
+          id: 0,
+          username: admin_username,
+          name: "Admin User"
+        },
+        roles: ["admin"],
+        tokens: {
+          access: "admin-access-token",
+          file: "admin-file-token"
+        }
+      }
+      build_response(data: login_response, message: "Admin login successful")
+    else
+      
+    end
+  end
+
+  def self.login_by_username(username, password) # contra servicio de accesos
     # Validate input
     if username.blank? || password.blank?
       return handle_error("username and password are required")

@@ -1,0 +1,22 @@
+@startuml
+
+entity users {
+  +id : INTEGER <<PK>>
+  --
+  email : VARCHAR(40)
+  password_digest : VARCHAR(80)
+  created_at : DATETIME
+}
+
+entity login_logs {
+  +id : INTEGER <<PK>>
+  --
+  user_id : INTEGER <<FK>>
+  success : BOOLEAN
+  ip_address : VARCHAR(40)
+  created_at : DATETIME
+}
+
+users ||--o{ login_logs
+
+@enduml

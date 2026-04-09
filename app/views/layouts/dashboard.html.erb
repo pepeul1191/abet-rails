@@ -24,7 +24,11 @@
     <%= render 'partials/navbar' %>
 
     <!-- Sidebar Partial -->
-    <%= render 'partials/sidebar' %>
+    <% if session[:roles]&.include?('admin') %>
+      <%= render 'partials/admin_sidebar' %>
+    <% else %>
+      <%= render 'partials/sidebar' %>
+    <% end %>
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">

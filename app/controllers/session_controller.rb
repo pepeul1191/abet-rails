@@ -11,8 +11,8 @@ class SessionController < ApplicationController
     username = params[:username]
     password = params[:password]
 
-    result = AuthService.login_by_username(username, password)
-
+    #result = AuthService.login_by_username(username, password)
+    result = AuthService.simple_login(username, password)
 
     if result[:success]
       user_data = result[:data]

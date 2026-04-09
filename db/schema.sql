@@ -1,38 +1,20 @@
 CREATE TABLE IF NOT EXISTS "schema_migrations" (version varchar(128) primary key);
-CREATE TABLE periods (
+CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(10) NOT NULL UNIQUE,
-  init_date DATE NOT NULL,
-  end_date DATE NOT NULL,
+  email VARCHAR(40) NOT NULL UNIQUE,
+  password_digest VARCHAR(80) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE login_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  success BOOLEAN NOT NULL,
+  ip_address VARCHAR(40),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
-CREATE TABLE IF NOT EXISTS "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
-CREATE TABLE program_types (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(20) NOT NULL UNIQUE
-);
-CREATE TABLE document_types (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(22) NOT NULL UNIQUE
-);
-CREATE TABLE industries (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(30) NOT NULL UNIQUE
-);
-CREATE TABLE specialisms (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name VARCHAR(70) NOT NULL
-);
+CREATE INDEX idx_login_logs_user_id ON login_logs(user_id);
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES
-  ('20251007234822'),
-  ('20251008125721'),
-  ('20251008125724'),
-  ('20251009212507'),
-  ('20251009212813'),
-  ('20251009212816'),
-  ('20251009213035'),
-  ('20251009213040'),
-  ('20251009221746'),
-  ('20251009221752');
+  ('20260409125609'),
+  ('20260409125616');
