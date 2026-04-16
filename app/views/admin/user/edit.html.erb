@@ -12,7 +12,7 @@
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-edit me-2"></i>
-          Editar Usuario: <%= @user.email %>
+          Editar Usuario: <%= @user.username %> (<%= @user.email %>)
         </h6>
       </div>
 
@@ -23,20 +23,76 @@
           <!-- CSRF token -->
           <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
-          <div class="col-md-4">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" maxlength="40" 
-                   value="<%= @user.email %>" required>
+          <div class="col-md-6">
+            <label class="form-label">Username *</label>
+            <input type="text" 
+                   name="username" 
+                   class="form-control" 
+                   maxlength="20" 
+                   value="<%= @user.username %>" 
+                   required>
+            <small class="text-muted">Máximo 20 caracteres, único</small>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-6">
+            <label class="form-label">Email *</label>
+            <input type="email" 
+                   name="email" 
+                   class="form-control" 
+                   maxlength="40" 
+                   value="<%= @user.email %>" 
+                   required>
+            <small class="text-muted">Máximo 40 caracteres, único</small>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label">URL de Imagen</label>
+            <input type="url" 
+                   name="image_url" 
+                   class="form-control" 
+                   maxlength="255"
+                   value="<%= @user.image_url %>"
+                   placeholder="https://ejemplo.com/imagen.jpg">
+            <small class="text-muted">Opcional. URL de la foto de perfil</small>
+          </div>
+
+          <!-- Vista previa de imagen actual -->
+          <% if @user.image_url.present? %>
+            <div class="col-md-12">
+              <label class="form-label">Imagen actual:</label><br>
+              <img src="<%= @user.image_url %>" 
+                   alt="<%= @user.username %>" 
+                   style="max-width: 100px; max-height: 100px; border-radius: 50%; object-fit: cover;"
+                   onerror="this.style.display='none'">
+            </div>
+          <% end %>
+
+          <div class="col-md-6">
             <label class="form-label">Contraseña</label>
-            <input type="password" name="password" class="form-control" placeholder="Dejar vacío para no cambiar">
+            <input type="password" 
+                   name="password" 
+                   class="form-control" 
+                   placeholder="Dejar vacío para no cambiar"
+                   minlength="6">
+            <small class="text-muted">Mínimo 6 caracteres (solo si desea cambiar)</small>
           </div>
 
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label class="form-label">Confirmar Contraseña</label>
-            <input type="password" name="password_confirmation" class="form-control" placeholder="Dejar vacío para no cambiar">
+            <input type="password" 
+                   name="password_confirmation" 
+                   class="form-control" 
+                   placeholder="Dejar vacío para no cambiar">
+          </div>
+
+          <!-- Información adicional -->
+          <div class="col-md-6">
+            <div class="alert alert-info mt-2">
+              <small>
+                <strong>Fecha de creación:</strong> <%= @user.created_at.strftime("%d/%m/%Y %H:%M") rescue "-" %><br>
+                <strong>Última actualización:</strong> <%= @user.updated_at.strftime("%d/%m/%Y %H:%M") rescue "-" %>
+              </small>
+            </div>
           </div>
 
           <div class="col-12 mt-4">
@@ -45,6 +101,9 @@
             </button>
             <a href="/admin/user" class="btn btn-warning ms-2">
               <i class="fa fa-times me-2"></i>Cancelar
+            </a>
+            <a href="/admin/user/<%= @user.id %>" class="btn btn-info ms-2">
+              <i class="fa fa-eye me-2"></i>Ver Detalles
             </a>
           </div>
         </form>

@@ -3,9 +3,25 @@
 entity users {
   +id : INTEGER <<PK>>
   --
+  username: VARCHAR(20)
   email : VARCHAR(40)
   password_digest : VARCHAR(80)
+  image_url : VARCHAR(255)
+  active: BOOLEAN
   created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity workers {
+  +id : INTEGER <<PK>>
+  --
+  names : VARCHAR(40)
+  last_names : VARCHAR(40)
+  code : VARCHAR(10)
+  phone : VARCHAR(40)
+  created_at : DATETIME
+  updated_at : DATETIME
+  user_id : INTEGER <<FK>>
 }
 
 entity login_logs {
@@ -17,6 +33,27 @@ entity login_logs {
   created_at : DATETIME
 }
 
+entity tasks {
+  +id : INTEGER <<PK>>
+  --
+  name : VARCHAR(40)
+  description : TEXT
+  data: TEXT
+  document_url : VARCHAR(255)
+  status : VARCHAR(20)
+  worker_id : INTEGER <<FK>>
+  period_id : INTEGER <<FK>>
+}
+
+entity periods {
+  +id : INTEGER <<PK>>
+  --
+  name : VARCHAR(10)
+}
+
 users ||--o{ login_logs
+workers ||--|| users
+workers ||--o{ tasks
+periods ||--o{ tasks
 
 @enduml
