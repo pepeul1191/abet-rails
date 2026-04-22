@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="<%= assets_path %>icon.png" type="image/png">
   <title><%= content_for?(:title) ? yield(:title) : 'Mi Dashboard' %></title>
-  <link rel="stylesheet" href="<%= assets_path %>dist/simplemde.min.css">
-  <link rel="stylesheet" href="<%= assets_path %>dist/vendor.min.css">
-  <link rel="stylesheet" href="<%= assets_path %>dist/app.min.css">
+  <link rel="stylesheet" href="<%= assets_path %>/dist/simplemde.min.css">
+  <link rel="stylesheet" href="<%= assets_path %>/dist/vendor.min.css">
+  <link rel="stylesheet" href="<%= assets_path %>/dist/app.min.css">
   <!-- Estilos personalizados -->
   <script>
     const URLS = {
-      BASE: "<%= ENV['APP_BASE_URL'] %>",
+      BASE: "<%= ENV['BASE_URL'] %>",
       FILES: "<%= ENV['URL_FILES_SERVICE'] %>",
     }
   </script>
@@ -48,9 +48,9 @@
     </div>
   </footer>
   <!-- Bootstrap JS -->
-  <script src="<%= assets_path %>dist/simplemde.min.js"></script>
-  <script src="<%= assets_path %>dist/vendor.js"></script>
-  <script src="<%= assets_path %>dist/app.min.js"></script>
+  <script src="<%= assets_path %>/dist/simplemde.min.js"></script>
+  <script src="<%= assets_path %>/dist/vendor.js"></script>
+  <script src="<%= assets_path %>/dist/app.min.js"></script>
   <%= yield :extra_js %>
 </body>
 </html>

@@ -55,7 +55,10 @@ module Admin
     end
 
     def create
-      resp = UserService.create(user_params)
+      puts '1 ++++++++++++++++++++++++++++++++++++'
+      puts params
+      puts '2 ++++++++++++++++++++++++++++++++++++'
+      resp = UserService.create(params)
 
       if resp[:success]
         redirect_to "/admin/user/#{resp[:data]['id']}/edit", notice: resp[:message]

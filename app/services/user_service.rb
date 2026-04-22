@@ -50,8 +50,9 @@ class UserService < ApplicationService
   end
 
   def self.create(params)
+    puts 'A ++++++++++++++++++++++++++++++++++++++'
     user = User.new(params.except(:password_confirmation))
-    
+    puts 'B ++++++++++++++++++++++++++++++++++++++'
     if params[:password_confirmation].present?
       user.password_confirmation = params[:password_confirmation]
     end
@@ -65,6 +66,8 @@ class UserService < ApplicationService
       handle_validation_error(user)
     end
   rescue => e
+    puts "Backtrace:"
+    puts e.backtrace
     handle_error("Error al crear usuario: #{e.message}", e.backtrace)
   end
 

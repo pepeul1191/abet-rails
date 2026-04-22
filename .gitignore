@@ -36,4 +36,5 @@
 node_modules
 /public/dist
 /public/fonts
+/public/users
 *db-*

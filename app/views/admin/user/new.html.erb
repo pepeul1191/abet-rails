@@ -1,9 +1,10 @@
+<!-- admin/user/new.html.erb -->
 <main class="main-content">
   <div class="container-fluid">
     <h3 class="mb-4">
       <a href="/admin/master-data"><i class="fa fa-cc-mastercard me-2"></i>Gestión de Datos Maestros</a> / 
       <a href="/admin/user">Usuarios</a> /
-      Editar Usuario
+      Crear Usuario
     </h3>
 
     <%= render 'partials/flash_messages' %>
@@ -12,7 +13,7 @@
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-edit me-2"></i>
-          Editar Usuario: <%= @user.username %> (<%= @user.email %>)
+          Datos del Usuario
         </h6>
       </div>
 
@@ -25,15 +26,17 @@
 
             <div class="mb-3">
               <img id="imagePreview"
-                  src="<%= @user.image_url || "#{ENV['STATIC_URL']}img/user.png" %>"
+                  src="<%= @user.image_url || "#{ENV['STATIC_URL']}/img/user.png" %>"
                   style="width: 125px; height: 125px; border-radius: 0%; object-fit: cover; border: 0px solid #ddd;">
             </div>
           </div>
 
           <!-- 📝 DERECHA: FORMULARIO -->
           <div class="col-md-10">
-            <form action="/admin/user/<%= @user.id %>" method="POST" class="row g-3">
-              <input type="hidden" name="_method" value="PUT">
+            <!-- 📝 INPUT FILE -->
+            <input type="file" id="imageFile" name="image_file" style="display: none;">
+            <!-- 📝 FORM -->
+            <form action="/admin/user" method="POST" class="row g-3">
               <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
               <div class="col-md-6">
@@ -48,36 +51,50 @@
                       value="<%= @user.email %>" required>
               </div>
 
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <label class="form-label">Contraseña</label>
                 <input type="password" name="password" class="form-control"
                       placeholder="Dejar vacío para no cambiar">
               </div>
 
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <label class="form-label">Confirmar Contraseña</label>
                 <input type="password" name="password_confirmation" class="form-control">
               </div>
 
-              <!-- 📤 CONTROLES DE IMAGEN (AHORA AQUÍ) -->
+              <!-- 📊 Campo Active - Estado del Usuario -->
               <div class="col-md-3">
-                <label class="form-label">Foto de Perfil</label>
+                <label class="form-label">Estado</label>
+                <select name="active" class="form-select">
+                  <option value="true" <%= 'selected' if @user.active == true %>>Activo</option>
+                  <option value="false" <%= 'selected' if @user.active == false %>>Inactivo</option>
+                </select>
+                <small class="text-muted">Define si el usuario puede acceder al sistema</small>
+              </div>
 
-                <div class="d-flex gap-2 mb-2">
-                  <button type="button" id="triggerFileButton" class="btn btn-outline-secondary flex-fill">
-                    <i class="fa fa-folder-open me-1"></i> Buscar
-                  </button>
-                  <button type="button" id="uploadButton" class="btn btn-primary flex-fill">
-                    <i class="fa fa-cloud-upload me-1"></i> Subir
-                  </button>
+              <!-- 📤 CONTROLES DE IMAGEN -->
+              <div class="col-md-2">
+                <!-- Contenedor para el plugin de imagen -->
+                <div id="fileUploadContainer">
+                  <label class="form-label">Foto de Perfil</label>
+                  <input type="hidden" name="image_url" id="uploadedImageUrl" value="<%= @user.image_url %>">
+                  <div class="d-flex gap-2 mb-2">
+                    <button type="button" id="triggerFileButton" class="btn btn-outline-secondary flex-fill">
+                      <i class="fa fa-folder-open me-1"></i> Buscar
+                    </button>
+                    <button type="button" id="uploadButton" class="btn btn-primary flex-fill">
+                      <i class="fa fa-cloud-upload me-1"></i> Subir
+                    </button>
+                    <button type="button" id="viewImageButton" class="btn btn-info flex-fill d-none">
+                      <i class="fa fa-eye me-1"></i> Ver
+                    </button>
+                  </div>
+
+                  <div id="fileNameDisplay" class="small text-muted"></div>
+                  <div id="helpText" class="small text-muted"></div>
+                  <div id="errorMessage" class="small text-danger"></div>
+                  <div id="successMessage" class="small text-success"></div>
                 </div>
-
-                <input type="file" id="imageFile" name="image_file" style="display: none;">
-                <input type="hidden" name="image_url" id="uploadedImageUrl">
-
-                <div id="fileNameDisplay" class="small text-muted"></div>
-                <div id="errorMessage" class="small text-danger"></div>
-                <div id="successMessage" class="small text-success"></div>
               </div>
 
               <div class="col-md-3 align-items-end" style="padding-top: 32px;">
@@ -101,9 +118,14 @@
 <% content_for :extra_js do %>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Inicializar FileUpload solo si existe el contenedor
-      if (document.getElementById('fileUploadContainer')) {
-        const fileUpload = new FileUpload({
+      // Asegurar que FileUpload esté disponible globalmente
+      if (typeof FileUpload === 'undefined') {
+        console.error('FileUpload class not loaded!');
+        return;
+      }
+
+      // Inicializar FileUpload usando los elementos existentes
+      const fileUpload = new FileUpload({
         containerId: "fileUploadContainer",
         fileInputId: "imageFile",
         triggerButtonId: "triggerFileButton",
@@ -117,16 +139,23 @@
         acceptedFormats: ["jpg", "jpeg", "png"],
         maxSizeMB: 5,
         baseURL: URLS.BASE,
-        url: "api/upload/image",
+        url: "api/file/public",
         triggerButtonText: "Buscar imagen",
-        triggerButtonIcon: "fa-image",
+        triggerButtonIcon: "fa-folder-open",
         extraParams: {
           user_id: <%= @user&.id || 'null' %>,
           authenticity_token: "<%= form_authenticity_token %>"
         },
         onSuccess: function(response) {
           document.getElementById('uploadedImageUrl').value = response.image_url;
-          document.getElementById('fileNameDisplay').dataset.imageUrl = response.image_url;
+          // Actualizar la vista previa
+          const previewImg = document.getElementById('imagePreview');
+          if (previewImg && response.image_url) {
+            previewImg.src = response.image_url;
+          }
+          if (document.getElementById('fileNameDisplay')) {
+            document.getElementById('fileNameDisplay').dataset.imageUrl = response.image_url;
+          }
         },
         onViewClick: function(file, imageUrl) {
           const urlToView = imageUrl || document.getElementById('uploadedImageUrl').value;
@@ -141,65 +170,11 @@
           }
         }
       });
-      }
       
-      // Funciones auxiliares
-      function showImagePreview(url) {
-        let previewDiv = document.getElementById('dynamicImagePreview');
-        if (!previewDiv) {
-          previewDiv = document.createElement('div');
-          previewDiv.id = 'dynamicImagePreview';
-          previewDiv.className = 'mt-3';
-          const container = document.getElementById('fileUploadContainer');
-          if (container) container.appendChild(previewDiv);
-        }
-        
-        previewDiv.innerHTML = `
-          <label class="form-label">Vista previa:</label><br>
-          <img src="${url}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd;">
-          <p class="text-muted small mt-1">Imagen subida correctamente</p>
-        `;
-      }
-      
-      function openImageModal(url) {
-        // Verificar si Bootstrap está disponible
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-          let modalHtml = `
-            <div class="modal fade" id="imagePreviewModal" tabindex="-1">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title">Vista previa de imagen</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                  </div>
-                  <div class="modal-body text-center">
-                    <img src="${url}" style="max-width: 100%; border-radius: 10px;">
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-          
-          // Remover modal existente si lo hay
-          const existingModal = document.getElementById('imagePreviewModal');
-          if (existingModal) existingModal.remove();
-          
-          // Agregar y mostrar modal
-          document.body.insertAdjacentHTML('beforeend', modalHtml);
-          const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-          modal.show();
-          
-          // Limpiar al cerrar
-          document.getElementById('imagePreviewModal').addEventListener('hidden.bs.modal', function() {
-            this.remove();
-          });
-        } else {
-          // Fallback si no hay Bootstrap
-          window.open(url, '_blank');
-        }
+      // Si hay una imagen existente, establecerla
+      const existingImageUrl = document.getElementById('uploadedImageUrl')?.value;
+      if (existingImageUrl && fileUpload.setExistingImageUrl) {
+        fileUpload.setExistingImageUrl(existingImageUrl);
       }
     });
   </script>

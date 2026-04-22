@@ -9,8 +9,8 @@ application up and running.
     #### DBMATE
     DB=sqlite:db/app.db
     #### RAILS
-    BASE_URL=http://localhost:3000/
-    STATIC_URL=http://localhost:3000/
+    BASE_URL=http://localhost:3000
+    STATIC_URL=http://localhost:3000
     USERNAME=admin
     PASSWORD=123
     # ACCESS SERVICE

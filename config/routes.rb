@@ -55,6 +55,10 @@ Rails.application.routes.draw do
     get 'user/:id/delete', to: 'user#delete'
   end
 
+  namespace :api do
+    post 'file/public', to: 'file#upload_user_image'
+  end
+
   match '*unmatched', to: 'errors#not_found', via: :all
   # Defines the root path route ("/")
   root "home#index"
