@@ -152,11 +152,10 @@ class UserService < ApplicationService
     user = User.find_by(id: id)
     return handle_not_found("Usuario no encontrado") unless user
 
-    # Soft delete (desactivar) en lugar de eliminar físicamente
-    if user.update(active: false)
-      build_response(message: "Usuario desactivado exitosamente")
+    if user.destroy
+      build_response(message: "Usuario eliminado")
     else
-      handle_error("No se pudo desactivar el usuario")
+      handle_error("No se pudo eliminar el usuario")
     end
   rescue => e
     handle_error("Error al desactivar usuario: #{e.message}", e.backtrace)
