@@ -1,9 +1,10 @@
+<!-- admin/user/edit.html.erb -->
 <main class="main-content">
   <div class="container-fluid">
     <h3 class="mb-4">
       <a href="/admin/master-data"><i class="fa fa-cc-mastercard me-2"></i>Gestión de Datos Maestros</a> / 
       <a href="/admin/user">Usuarios</a> /
-      Editar Usuario
+      Editar Usuario: <%= @user['username'] %> (<%= @user['email'] %>)
     </h3>
 
     <%= render 'partials/flash_messages' %>
@@ -12,102 +13,200 @@
       <div class="card-header">
         <h6 class="mb-0">
           <i class="fa fa-edit me-2"></i>
-          Editar Usuario: <%= @user.username %> (<%= @user.email %>)
+          Datos del Usuario
         </h6>
       </div>
 
       <div class="card-body">
-        <form action="/admin/user/<%= @user.id %>" method="POST" class="row g-3">
-          <!-- Método PUT -->
-          <input type="hidden" name="_method" value="PUT">
-          <!-- CSRF token -->
-          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        <div class="row">
 
-          <div class="col-md-6">
-            <label class="form-label">Username *</label>
-            <input type="text" 
-                   name="username" 
-                   class="form-control" 
-                   maxlength="20" 
-                   value="<%= @user.username %>" 
-                   required>
-            <small class="text-muted">Máximo 20 caracteres, único</small>
-          </div>
+          <!-- 🖼️ IZQUIERDA: SOLO IMAGEN -->
+          <div class="col-md-2 text-center">
+            <label class="form-label">Foto</label>
 
-          <div class="col-md-6">
-            <label class="form-label">Email *</label>
-            <input type="email" 
-                   name="email" 
-                   class="form-control" 
-                   maxlength="40" 
-                   value="<%= @user.email %>" 
-                   required>
-            <small class="text-muted">Máximo 40 caracteres, único</small>
-          </div>
+            <% image =
+              if @user['image_url'].present?
+                if @user['image_url'].include?("randomuser.me")
+                  @user['image_url'] # URL externa
+                else
+                  ENV['STATIC_URL'] + @user['image_url'] # local/CDN
+                end
+              else
+                "#{ENV['STATIC_URL']}/img/user.png"
+              end
+            %>
 
-          <div class="col-md-12">
-            <label class="form-label">URL de Imagen</label>
-            <input type="url" 
-                   name="image_url" 
-                   class="form-control" 
-                   maxlength="255"
-                   value="<%= @user.image_url %>"
-                   placeholder="https://ejemplo.com/imagen.jpg">
-            <small class="text-muted">Opcional. URL de la foto de perfil</small>
-          </div>
-
-          <!-- Vista previa de imagen actual -->
-          <% if @user.image_url.present? %>
-            <div class="col-md-12">
-              <label class="form-label">Imagen actual:</label><br>
-              <img src="<%= @user.image_url %>" 
-                   alt="<%= @user.username %>" 
-                   style="max-width: 100px; max-height: 100px; border-radius: 50%; object-fit: cover;"
-                   onerror="this.style.display='none'">
+            <div class="mb-3">
+              <img id="imagePreview"
+                  src="<%= image %>"
+                  style="width: 125px; height: 125px; border-radius: 0%; object-fit: cover; border: 0px solid #ddd;">
             </div>
-          <% end %>
-
-          <div class="col-md-6">
-            <label class="form-label">Contraseña</label>
-            <input type="password" 
-                   name="password" 
-                   class="form-control" 
-                   placeholder="Dejar vacío para no cambiar"
-                   minlength="6">
-            <small class="text-muted">Mínimo 6 caracteres (solo si desea cambiar)</small>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">Confirmar Contraseña</label>
-            <input type="password" 
-                   name="password_confirmation" 
-                   class="form-control" 
-                   placeholder="Dejar vacío para no cambiar">
-          </div>
-
-          <!-- Información adicional -->
-          <div class="col-md-6">
-            <div class="alert alert-info mt-2">
+            
+            <!-- Información adicional 
+            <div class="alert alert-info mt-2 text-start">
               <small>
-                <strong>Fecha de creación:</strong> <%= @user.created_at.strftime("%d/%m/%Y %H:%M") rescue "-" %><br>
-                <strong>Última actualización:</strong> <%= @user.updated_at.strftime("%d/%m/%Y %H:%M") rescue "-" %>
+                <strong>Creado:</strong> <%= @user['created_at'].strftime("%d/%m/%Y %H:%M") rescue "-" %><br>
+                <strong>Actualizado:</strong> <%= @user['updated_at'].strftime("%d/%m/%Y %H:%M") rescue "-" %>
               </small>
             </div>
+            -->
           </div>
 
-          <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-success">
-              <i class="fa fa-save me-2"></i>Guardar Cambios
-            </button>
-            <a href="/admin/user" class="btn btn-warning ms-2">
-              <i class="fa fa-times me-2"></i>Cancelar
-            </a>
-            <a href="/admin/user/<%= @user.id %>" class="btn btn-info ms-2">
-              <i class="fa fa-eye me-2"></i>Ver Detalles
-            </a>
+          <!-- 📝 DERECHA: FORMULARIO -->
+          <div class="col-md-10">
+            <!-- 📝 INPUT FILE -->
+            <input type="file" id="imageFile" name="image_file" style="display: none;">
+            <!-- 📝 FORM -->
+            <form action="/admin/user/<%= @user['id'] %>" method="POST" class="row g-3">
+              <!-- Método PUT -->
+              <input type="hidden" name="_method" value="PUT">
+              <!-- CSRF token -->
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+              <div class="col-md-6">
+                <label class="form-label">Username *</label>
+                <input type="text" name="user[username]" class="form-control" maxlength="20"
+                       value="<%= @user['username'] %>" required>
+                <small class="text-muted">Máximo 20 caracteres, único</small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <input type="email" name="user[email]" class="form-control" maxlength="40"
+                       value="<%= @user['email'] %>" required>
+                <small class="text-muted">Máximo 40 caracteres, único</small>
+              </div>
+
+              <div class="col-md-2">
+                <label class="form-label">Contraseña</label>
+                <input type="password" name="user[password]" class="form-control" disabled 
+                       placeholder="Dejar vacío para no cambiar" minlength="6">
+                <small class="text-muted">Mínimo 6 caracteres</small>
+              </div>
+
+              <div class="col-md-2">
+                <label class="form-label">Confirmar Contraseña</label>
+                <input type="password" name="user[password_confirmation]" class="form-control" disabled
+                       placeholder="Dejar vacío para no cambiar">
+              </div>
+
+              <!-- 📊 Campo Active - Estado del Usuario -->
+              <div class="col-md-3">
+                <label class="form-label">Estado</label>
+                <select name="user[active]" class="form-select">
+                  <option value="true" <%= 'selected' if @user['active'] == true %>>Activo</option>
+                  <option value="false" <%= 'selected' if @user['active'] == false %>>Inactivo</option>
+                </select>
+                <small class="text-muted">Define si el usuario puede acceder al sistema</small>
+              </div>
+
+              <!-- 📤 CONTROLES DE IMAGEN -->
+              <div class="col-md-2">
+                <!-- Contenedor para el plugin de imagen -->
+                <div id="fileUploadContainer">
+                  <label class="form-label">Foto de Perfil</label>
+                  <input type="hidden" name="user[image_url]" id="uploadedImageUrl" value="<%= @user['image_url'] %>">
+                  <div class="d-flex gap-2 mb-2">
+                    <button type="button" id="triggerFileButton" class="btn btn-outline-secondary flex-fill">
+                      <i class="fa fa-folder-open me-1"></i> Buscar
+                    </button>
+                    <button type="button" id="uploadButton" class="btn btn-primary flex-fill">
+                      <i class="fa fa-cloud-upload me-1"></i> Subir
+                    </button>
+                    <button type="button" id="viewImageButton" class="btn btn-info flex-fill d-none">
+                      <i class="fa fa-eye me-1"></i> Ver
+                    </button>
+                  </div>
+
+                  <div id="fileNameDisplay" class="small text-muted"></div>
+                  <div id="helpText" class="small text-muted"></div>
+                  <div id="errorMessage" class="small text-danger"></div>
+                  <div id="successMessage" class="small text-success"></div>
+                </div>
+              </div>
+
+              <div class="col-md-3 align-items-end" style="padding-top: 32px;">
+                <button type="submit" class="btn btn-success">
+                  <i class="fa fa-save me-2"></i> Guardar Cambios
+                </button>
+                <a href="/admin/user" class="btn btn-warning ms-2">
+                  <i class="fa fa-times me-2"></i> Cancelar
+                </a>
+                <a href="/admin/user/<%= @user['id'] %>" class="btn btn-info ms-2 d-none">
+                  <i class="fa fa-eye me-2"></i> Ver Detalles
+                </a>
+              </div>
+            </form>
           </div>
-        </form>
+
+        </div>
       </div>
+
     </div>
   </div>
 </main>
+
+<% content_for :extra_js do %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Asegurar que FileUpload esté disponible globalmente
+      if (typeof FileUpload === 'undefined') {
+        console.error('FileUpload class not loaded!');
+        return;
+      }
+
+      // Inicializar FileUpload usando los elementos existentes
+      const fileUpload = new FileUpload({
+        containerId: "fileUploadContainer",
+        fileInputId: "imageFile",
+        triggerButtonId: "triggerFileButton",
+        uploadButtonId: "uploadButton",
+        viewButtonId: "viewImageButton",
+        errorMessageId: "errorMessage",
+        successMessageId: "successMessage",
+        helpTextId: "helpText",
+        fileNameDisplayId: "fileNameDisplay",
+        label: "Foto de perfil",
+        acceptedFormats: ["jpg", "jpeg", "png"],
+        maxSizeMB: 5,
+        baseURL: URLS.BASE,
+        url: "api/file/public",
+        triggerButtonText: "Buscar imagen",
+        triggerButtonIcon: "fa-folder-open",
+        extraParams: {
+          user_id: <%= @user['id'] %>,
+          authenticity_token: "<%= form_authenticity_token %>"
+        },
+        onSuccess: function(response) {
+          document.getElementById('uploadedImageUrl').value = response.image_url;
+          // Actualizar la vista previa
+          const previewImg = document.getElementById('imagePreview');
+          if (previewImg && response.image_url) {
+            previewImg.src = response.image_url;
+          }
+          if (document.getElementById('fileNameDisplay')) {
+            document.getElementById('fileNameDisplay').dataset.imageUrl = response.image_url;
+          }
+        },
+        onViewClick: function(file, imageUrl) {
+          const urlToView = imageUrl || document.getElementById('uploadedImageUrl').value;
+          if (urlToView) {
+            window.open(urlToView, '_blank');
+          } else if (file) {
+            const tempUrl = URL.createObjectURL(file);
+            window.open(tempUrl, '_blank');
+            setTimeout(() => URL.revokeObjectURL(tempUrl), 100);
+          } else {
+            alert('No hay imagen para visualizar');
+          }
+        }
+      });
+      
+      // Si hay una imagen existente, establecerla
+      const existingImageUrl = document.getElementById('uploadedImageUrl')?.value;
+      if (existingImageUrl && fileUpload.setExistingImageUrl) {
+        fileUpload.setExistingImageUrl(existingImageUrl);
+      }
+    });
+  </script>
+<% end %>

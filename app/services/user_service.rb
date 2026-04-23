@@ -1,6 +1,6 @@
 # app/services/user_service.rb
 class UserService < ApplicationService
-  def self.fetch_one(id)
+  def self.fetch_one(id, as_json: true)
     user = User.find_by(id: id)
     return handle_not_found("Usuario no encontrado") unless user
 
@@ -50,18 +50,60 @@ class UserService < ApplicationService
   end
 
   def self.create(params)
-    puts 'A ++++++++++++++++++++++++++++++++++++++'
-    user = User.new(params.except(:password_confirmation))
-    puts 'B ++++++++++++++++++++++++++++++++++++++'
-    if params[:password_confirmation].present?
-      user.password_confirmation = params[:password_confirmation]
+    # Extract password fields
+    password = params[:password]
+    password_confirmation = params[:password_confirmation]
+    
+    # Set default image_url if empty
+    image_url = params[:image_url].presence || 'img/user.png'
+    
+    # Clean params by removing password fields
+    clean_params = params.except(:password, :password_confirmation).merge(image_url: image_url)
+    
+    # Case 1: Both passwords are empty - generate random password
+    if password.blank? && password_confirmation.blank?
+      # Generate a random password
+      random_password = generate_random_password
+      
+      user = User.new(clean_params)
+      user.password = random_password
+      user.password_confirmation = random_password
+      
+    # Case 2: Both passwords are provided - validate they match
+    elsif password.present? && password_confirmation.present?
+      if password == password_confirmation
+        user = User.new(clean_params)
+        user.password = password
+        user.password_confirmation = password_confirmation
+      else
+        return {
+          success: false,
+          error: "Las contraseñas no coinciden",
+          status: :unprocessable_entity
+        }
+      end
+      
+    # Case 3: Only one password provided - error
+    else
+      return {
+        success: false,
+        error: "Debe proporcionar ambas contraseñas o ninguna",
+        status: :unprocessable_entity
+      }
     end
-
+    
     # Por defecto el usuario se crea activo
     user.active = true if user.active.nil?
-
+    
     if user.save
-      build_response(data: user.as_json(except: :password_digest), message: "Usuario creado exitosamente")
+      response_data = user.as_json(except: :password_digest)
+      
+      # If random password was generated, add it to response for admin to see
+      if password.blank? && password_confirmation.blank?
+        response_data[:generated_password] = random_password
+      end
+      
+      build_response(data: response_data, message: "Usuario creado exitosamente")
     else
       handle_validation_error(user)
     end
@@ -69,6 +111,19 @@ class UserService < ApplicationService
     puts "Backtrace:"
     puts e.backtrace
     handle_error("Error al crear usuario: #{e.message}", e.backtrace)
+  end
+
+  # Helper method to generate random password
+  def self.generate_random_password(length = 12)
+    # Generate a random password with letters, numbers, and special characters
+    chars = [('a'..'z'), ('A'..'Z'), (0..9)].map(&:to_a).flatten
+    special_chars = ['!', '@', '#', '$', '%', '&', '*']
+    
+    # Ensure at least one special character for security
+    password = special_chars.sample + Array.new(length - 1) { chars.sample }.join
+    
+    # Shuffle the password to mix the special character
+    password.chars.shuffle.join
   end
 
   def self.update(id, params)

@@ -98,7 +98,19 @@
                     <td><%= user['email'] %></td>
                     <td class="text-center">
                       <% if user['image_url'].present? %>
-                        <img src="<%= user['image_url'] %>" 
+                        <% image =
+                          if user['image_url'].present?
+                            if user['image_url'].include?("randomuser.me")
+                              user['image_url'] # URL externa
+                            else
+                              ENV['STATIC_URL'] + user['image_url'] # local/CDN
+                            end
+                          else
+                            "#{ENV['STATIC_URL']}/img/user.png"
+                          end
+                        %>
+
+                        <img src="<%= image %>" 
                              alt="<%= user['username'] %>" 
                              style="width: 35px; height: 35px; object-fit: cover; border-radius: 50%;">
                       <% else %>

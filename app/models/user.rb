@@ -1,6 +1,6 @@
 # app/models/user.rb
 class User < ApplicationRecord
-  # has_secure_password
+  has_secure_password
 
   has_many :login_logs, dependent: :destroy
 
@@ -8,7 +8,7 @@ class User < ApplicationRecord
   validates :username, presence: true, uniqueness: true, length: { maximum: 20 }
   validates :email, presence: true, uniqueness: true, length: { maximum: 40 }
   validates :image_url, length: { maximum: 255 }, allow_blank: true
-  validates :active, inclusion: { in: [true, false] }
+  validates :active, inclusion: { in: [true, false] }, allow_nil: true
 
   # Scopes
   scope :active, -> { where(active: true) }

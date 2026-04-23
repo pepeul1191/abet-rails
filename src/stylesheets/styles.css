@@ -216,7 +216,7 @@ footer{
     background-color: transparent !important;
 }
 
-.form-control, .btn{
+.form-control, .btn, .form-select{
     border-radius: 0px;
 }
 

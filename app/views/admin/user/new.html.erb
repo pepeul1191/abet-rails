@@ -41,31 +41,31 @@
 
               <div class="col-md-6">
                 <label class="form-label">Username *</label>
-                <input type="text" name="username" class="form-control"
+                <input type="text" name="user[username]" class="form-control"
                       value="<%= @user.username %>" required>
               </div>
 
               <div class="col-md-6">
                 <label class="form-label">Email *</label>
-                <input type="email" name="email" class="form-control"
+                <input type="email" name="user[email]" class="form-control"
                       value="<%= @user.email %>" required>
               </div>
 
               <div class="col-md-2">
                 <label class="form-label">Contraseña</label>
-                <input type="password" name="password" class="form-control"
+                <input type="password" name="user[password]" disabled class="form-control"
                       placeholder="Dejar vacío para no cambiar">
               </div>
 
               <div class="col-md-2">
                 <label class="form-label">Confirmar Contraseña</label>
-                <input type="password" name="password_confirmation" class="form-control">
+                <input type="password" name="user[password_confirmation]" disabled class="form-control">
               </div>
 
               <!-- 📊 Campo Active - Estado del Usuario -->
               <div class="col-md-3">
                 <label class="form-label">Estado</label>
-                <select name="active" class="form-select">
+                <select name="user[active]" class="form-select">
                   <option value="true" <%= 'selected' if @user.active == true %>>Activo</option>
                   <option value="false" <%= 'selected' if @user.active == false %>>Inactivo</option>
                 </select>
@@ -77,7 +77,7 @@
                 <!-- Contenedor para el plugin de imagen -->
                 <div id="fileUploadContainer">
                   <label class="form-label">Foto de Perfil</label>
-                  <input type="hidden" name="image_url" id="uploadedImageUrl" value="<%= @user.image_url %>">
+                  <input type="hidden" name="user[image_url]" id="uploadedImageUrl" value="<%= @user.image_url %>">
                   <div class="d-flex gap-2 mb-2">
                     <button type="button" id="triggerFileButton" class="btn btn-outline-secondary flex-fill">
                       <i class="fa fa-folder-open me-1"></i> Buscar
