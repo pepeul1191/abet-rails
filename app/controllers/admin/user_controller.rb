@@ -82,6 +82,7 @@ module Admin
     end
 
     def update
+      user_params = params[:user].permit(:username, :email, :password, :password_confirmation, :active, :image_url)
       resp = UserService.update(params[:id], user_params)
       
       if resp[:success]
