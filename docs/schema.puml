@@ -10,8 +10,12 @@ entity users {
   active: BOOLEAN
   created_at : DATETIME
   updated_at : DATETIME
+  provider : VARCHAR(20)
+  uid : VARCHAR(255)
+  google_token : TEXT
+  google_refresh_token : TEXT
+  last_login_at : DATETIME
 }
-
 entity workers {
   +id : INTEGER <<PK>>
   --

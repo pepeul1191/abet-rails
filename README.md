@@ -13,13 +13,16 @@ application up and running.
     STATIC_URL=http://localhost:3000
     USERNAME=admin
     PASSWORD=123
-    # ACCESS SERVICE
+    #### ACCESS SERVICE
     SYSTEM_ID=1
     X_AUTH_ACCESS_SERVICE=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
     URL_ACCESS_SERVICE=http://localhost:8085
-    # FILES SERVICE
+    #### FILES SERVICE
     URL_FILES_SERVICE=http://localhost:4000
     X_AUTH_FILES_SERVICE=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
+    #### GOOGLE OAUTH
+    GOOGLE_CLIENT_ID=your_google_client_id
+    GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 ### Migraciones con DBMATE
 

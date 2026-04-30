@@ -16,9 +16,10 @@ class AuthService < ApplicationService
     if username == admin_username && password == admin_password
       login_response = {
         user: {
-          id: 0,
+          id: 1,
           username: admin_username,
-          name: "Admin User"
+          name: "Admin User",
+          email: "jovaldiv@ulima.edu.pe",
         },
         roles: ["admin"],
         tokens: {
@@ -59,6 +60,49 @@ class AuthService < ApplicationService
     }
 
     build_response(data: login_response, message: "Login successful")
+  end
+
+  # Validar token de Google
+  def self.google_token_valid?(token)
+    return false if token.blank?
+    
+    begin
+      response = HTTParty.get("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=#{token}")
+      response.success?
+    rescue
+      false
+    end
+  end
+
+  # Método para refrescar token de Google
+  def self.refresh_google_token(user)
+    return handle_error("User has no refresh token") if user.google_refresh_token.blank?
+    
+    begin
+      response = HTTParty.post("https://oauth2.googleapis.com/token", {
+        body: {
+          client_id: ENV['GOOGLE_CLIENT_ID'],
+          client_secret: ENV['GOOGLE_CLIENT_SECRET'],
+          refresh_token: user.google_refresh_token,
+          grant_type: 'refresh_token'
+        },
+        headers: { 'Content-Type' => 'application/x-www-form-urlencoded' }
+      })
+      
+      if response.success?
+        token_data = response.parsed_response
+        user.update(google_token: token_data['access_token'])
+        
+        build_response(
+          data: { token: token_data['access_token'] },
+          message: "Token refreshed successfully"
+        )
+      else
+        handle_error("Failed to refresh token: #{response.code}")
+      end
+    rescue => e
+      handle_error("Error refreshing token: #{e.message}")
+    end
   end
 
   private

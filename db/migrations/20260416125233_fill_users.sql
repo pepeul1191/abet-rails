@@ -1,7 +1,7 @@
 -- migrate:up
 
 INSERT INTO users (id, username, email, password_digest, image_url, active, created_at, updated_at) VALUES
-(1, 'jperez', 'juan.perez@ulima.edu.pe', 'hashed_password_1', 'https://randomuser.me/api/portraits/men/1.jpg', 1, datetime('now', '-30 days'), datetime('now', '-30 days')),
+(1, 'admin', 'jovaldiv@ulima.edu.pe', 'hashed_password_1', 'https://randomuser.me/api/portraits/men/1.jpg', 1, datetime('now', '-30 days'), datetime('now', '-30 days')),
 (2, 'mgarcia', 'maria.garcia@ulima.edu.pe', 'hashed_password_2', 'https://randomuser.me/api/portraits/women/2.jpg', 1, datetime('now', '-28 days'), datetime('now', '-28 days')),
 (3, 'crodriguez', 'carlos.rodriguez@ulima.edu.pe', 'hashed_password_3', 'https://randomuser.me/api/portraits/men/3.jpg', 1, datetime('now', '-25 days'), datetime('now', '-25 days')),
 (4, 'lfernandez', 'laura.fernandez@ulima.edu.pe', 'hashed_password_4', 'https://randomuser.me/api/portraits/women/4.jpg', 0, datetime('now', '-22 days'), datetime('now', '-22 days')), -- Inactivo

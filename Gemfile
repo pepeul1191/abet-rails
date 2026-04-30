@@ -53,3 +53,6 @@ end
 gem 'dotenv-rails', groups: [:development, :test, :production]
 gem 'httparty'
 gem 'bcrypt', '~> 3.1.7'
+# oauth2 para autenticación con Google
+gem 'omniauth-google-oauth2'
+gem 'omniauth-rails_csrf_protection'  # Protección CSRF para OmniAuth

@@ -13,8 +13,14 @@ Rails.application.routes.draw do
   post 'sign-in', to: 'session#login', as: :login
   get 'reset-password', to: 'session#reset_password', as: :reset_password
   get 'sign-up', to: 'session#sign_up', as: :sign_up
+  # get 'sign-out', to: 'session#sign_out', as: :sign_out
+  delete 'sign-out', to: 'session#sign_out', as: :sign_out_delete
   get 'sign-out', to: 'session#sign_out', as: :sign_out
   get 'api/v1/session', to: 'session#get_session', as: :get_session
+
+  ### oauth2 routes
+  get '/auth/google_oauth2/callback', to: 'session#create'
+  get '/auth/google_oauth2', to: 'session#google_oauth'  # Inicia la autenticación
 
   namespace :admin do
     get 'master-data', to: 'admin#master_data'
