@@ -1,15 +1,23 @@
 # app/controllers/errors_controller.rb
 class ErrorsController < ApplicationController
   def not_found
-    if should_render_json?
-      render json: {
-        data: nil,
-        sucess: false,
-        message: "Recuro no encontrado" ,
-        error: "404 - #{request.method} #{request.path}" ,
-      }, status: :not_found
-    else
-      render 'errors/not_found', status: :not_found, layout: 'blank'
+    respond_to do |format|
+      format.html do
+        render 'errors/not_found', layout: 'blank', status: :not_found
+      end
+
+      format.json do
+        render json: {
+          data: nil,
+          success: false,
+          message: "Recurso no encontrado",
+          error: "404 - #{request.method} #{request.path}"
+        }, status: :not_found
+      end
+
+      format.any do
+        head :not_found
+      end
     end
   end
 

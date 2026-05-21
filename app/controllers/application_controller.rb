@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
   private
 
   def set_custom_header
-    response.set_header("Server", "Ubuntu")
+    response.set_header("Server", "Ubuntu, Ruby")
   end
 
   def require_login

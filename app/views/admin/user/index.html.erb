@@ -99,20 +99,17 @@
                     <td class="text-center">
                       <% if user['image_url'].present? %>
                         <% image =
-                          if user['image_url'].present?
-                            if user['image_url'].include?("randomuser.me")
-                              user['image_url'] # URL externa
-                            else
-                              ENV['STATIC_URL'] + user['image_url'] # local/CDN
-                            end
+                          if user['image_url'].include?("randomuser.me") ||
+                            user['image_url'].include?("googleusercontent")
+                            user['image_url']
                           else
-                            "#{ENV['STATIC_URL']}/img/user.png"
+                            ENV['STATIC_URL'] + user['image_url']
                           end
                         %>
 
                         <img src="<%= image %>" 
-                             alt="<%= user['username'] %>" 
-                             style="width: 35px; height: 35px; object-fit: cover; border-radius: 50%;">
+                            alt="<%= user['username'] %>" 
+                            style="width: 35px; height: 35px; object-fit: cover; border-radius: 50%;">
                       <% else %>
                         <i class="fa fa-user-circle fa-2x text-muted"></i>
                       <% end %>

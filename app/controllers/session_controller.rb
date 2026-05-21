@@ -87,17 +87,10 @@ class SessionController < ApplicationController
     end
 
     # Buscar o crear usuario con los datos de Google
-    user = find_or_create_user_from_google(auth)
+    user = find_user_from_google(auth)
     
-    if user&.persisted? && user.active?
-      # Actualizar último login
-      user.update(
-        last_login_at: Time.current,
-        image_url: auth.info.image,
-        google_token: auth.credentials.token,
-        google_refresh_token: auth.credentials.refresh_token
-      ) if user.respond_to?(:last_login_at=)
-      
+    if user.active?
+    
       # Preparar estructura de sesión
       session[:user] = {
         'id' => user.id,
@@ -139,7 +132,7 @@ class SessionController < ApplicationController
         )
       end
       
-      flash[:alert] = user&.errors&.full_messages&.join(', ') || "No se pudo completar el inicio de sesión con Google"
+      flash[:alert] = user&.errors&.full_messages&.join(', ') || "Usuario de Google no registrado o inactivo. Por favor, contacte al administrador."
       redirect_to sign_in_path
     end
   end
@@ -170,14 +163,32 @@ class SessionController < ApplicationController
     end
   end
 
-    def find_or_create_user_from_google(auth)
+  def find_user_from_google(auth)
+    # Buscar por email si ya existe
+    user = User.find_by(email: auth.info.email)
+    if user
+      # Vincular cuenta existente con Google
+      user.update(
+        last_login_at: Time.current,
+        provider: auth.provider,
+        uid: auth.uid,
+        google_token: auth.credentials.token,
+        google_refresh_token: auth.credentials.refresh_token,
+        # image_url: auth.info.image
+      )
+      return user
+    else
+      Rails.logger.error "Su cuenta no está registrada. Por favor, contacte al administrador."
+      return nil
+    end
+  end
+
+  def find_or_create_user_from_google(auth)
     # Buscar por provider y uid
     user = User.find_by(provider: auth.provider, uid: auth.uid)
-    
     if user.nil?
       # Buscar por email si ya existe
       user = User.find_by(email: auth.info.email)
-      
       if user
         # Vincular cuenta existente con Google
         user.update(
@@ -205,6 +216,11 @@ class SessionController < ApplicationController
           return nil
         end
       end
+    else
+      # usuario no registrado
+      #reset_session
+      flash[:notice] = "Usuario no registrado"
+      redirect_to sign_in_path
     end
     
     user
@@ -241,11 +257,5 @@ class SessionController < ApplicationController
     rescue => e
       Rails.logger.error "Error revoking Google token: #{e.message}"
     end
-  end
-
-  def sign_out
-    reset_session
-    flash[:notice] = "Sesión cerrada correctamente"
-    redirect_to sign_in_path
   end
 end
