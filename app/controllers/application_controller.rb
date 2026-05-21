@@ -4,6 +4,21 @@ class ApplicationController < ActionController::Base
 
   before_action :set_custom_header
 
+  layout :layout_by_role
+
+  private
+
+  def layout_by_role
+    # puts 'session[:roles] = ' + session[:roles].to_s
+    if session[:roles]&.include?("admin")
+      "dashboard"
+    elsif session[:roles]&.include?("user")
+      "worker"
+    else
+      "blank"
+    end
+  end
+
   private
 
   def set_custom_header

@@ -90,7 +90,6 @@ class SessionController < ApplicationController
     user = find_user_from_google(auth)
     
     if user.active?
-    
       # Preparar estructura de sesión
       session[:user] = {
         'id' => user.id,
