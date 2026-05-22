@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
     if session[:roles]&.include?("admin")
       "dashboard"
     elsif session[:roles]&.include?("user")
-      "worker"
+      "dashboard"
     else
       "blank"
     end

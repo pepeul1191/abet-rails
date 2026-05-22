@@ -16,17 +16,6 @@ entity users {
   google_refresh_token : TEXT
   last_login_at : DATETIME
 }
-entity workers {
-  +id : INTEGER <<PK>>
-  --
-  names : VARCHAR(40)
-  last_names : VARCHAR(40)
-  code : VARCHAR(10)
-  phone : VARCHAR(40)
-  created_at : DATETIME
-  updated_at : DATETIME
-  user_id : INTEGER <<FK>>
-}
 
 entity login_logs {
   +id : INTEGER <<PK>>
@@ -45,7 +34,8 @@ entity tasks {
   data: TEXT
   document_url : VARCHAR(255)
   status : VARCHAR(20)
-  worker_id : INTEGER <<FK>>
+  user_id : INTEGER <<FK>>
+  task_type_id : INTEGER <<FK>>
   period_id : INTEGER <<FK>>
 }
 
@@ -55,9 +45,17 @@ entity periods {
   name : VARCHAR(10)
 }
 
+entity task_types {
+  +id : INTEGER <<PK>>
+  --
+  name : VARCHAR(25)
+  description : VARCHAR(100)
+  video_url : VARCHAR(255)
+}
+
 users ||--o{ login_logs
-workers ||--|| users
-workers ||--o{ tasks
+users ||--o{ tasks
 periods ||--o{ tasks
+task_types ||--o{ tasks
 
 @enduml
