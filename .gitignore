@@ -38,3 +38,6 @@ node_modules
 /public/fonts
 /public/users
 *db-*
+
+scripts/tmp
+scripts/.~lock.*

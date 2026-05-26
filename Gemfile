@@ -56,3 +56,7 @@ gem 'bcrypt', '~> 3.1.7'
 # oauth2 para autenticación con Google
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection'  # Protección CSRF para OmniAuth
+
+# Para generar documentos Word (.docx)
+gem 'rubyzip', '~> 2.3'
+gem 'libreconv', '~> 0.9'
