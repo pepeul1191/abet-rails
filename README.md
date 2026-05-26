@@ -61,3 +61,20 @@ CREATE TABLE recurso_coleccion (
   FOREIGN KEY (recurso_id) REFERENCES recurso (id)
 );
 ```
+
+Librerías adicionales - Ubuntu
+
+    # Actualizar repositorios
+    sudo apt-get update
+
+    # Instalar LibreOffice (necesario para convertir Word a PDF)
+    sudo apt-get install -y libreoffice
+
+    # Instalar librerías de fuentes (para evitar problemas con fuentes en PDF)
+    sudo apt-get install -y fonts-liberation fonts-dejavu-core fonts-freefont-ttf
+
+    # Instalar herramientas de línea de comandos útiles
+    sudo apt-get install -y zip unzip
+
+    # Instalar dependencias de Ruby (por si acaso)
+    sudo apt-get install -y ruby-dev build-essential
