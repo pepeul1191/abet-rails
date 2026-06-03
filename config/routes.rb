@@ -52,6 +52,13 @@ Rails.application.routes.draw do
     put 'specialism/:id', to: 'specialism#update'
     get 'specialism/:id/edit', to: 'specialism#edit'
     get 'specialism/:id/delete', to: 'specialism#delete'
+    # task_type
+    get 'task-type', to: 'task_type#index'
+    get 'task-type/new', to: 'task_type#new'
+    post 'task-type', to: 'task_type#create'
+    put 'task-type/:id', to: 'task_type#update'
+    get 'task-type/:id/edit', to: 'task_type#edit'
+    get 'task-type/:id/delete', to: 'task_type#delete'
     # user
     get 'user', to: 'user#index'
     get 'user/new', to: 'user#new'
@@ -63,6 +70,13 @@ Rails.application.routes.draw do
 
   namespace :api do
     post 'file/public', to: 'file#upload_user_image'
+  end
+
+  namespace :teachers do
+    get '/', to: 'home#index'
+    get '/abet', to: 'abet#index'
+    get '/abet/groups/new', to: 'abet#groups_new'
+    post '/abet/gropus', to: 'abet#groups_generate'
   end
 
   match '*unmatched', to: 'errors#not_found', via: :all

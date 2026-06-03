@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
 
   def set_custom_header
     response.set_header("Server", "Ubuntu, Ruby")
+    response.set_header("X-Powered-By", "Ruby on Rails #{Rails.version}")
   end
 
   def require_login

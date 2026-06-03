@@ -6,6 +6,9 @@ class AuthService < ApplicationService
   headers 'Content-Type' => 'application/json', 'Accept' => 'application/json'
 
   def self.simple_login(username, password)
+    puts '1 +++++++++++++++++++++++++++++++'
+    puts ENV['USERNAME']
+    puts '2 +++++++++++++++++++++++++++++++'
     admin_username = ENV['USERNAME']
     admin_password = ENV['PASSWORD']
 

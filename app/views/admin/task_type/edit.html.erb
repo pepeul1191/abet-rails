@@ -1,0 +1,68 @@
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/admin/master-data" class="text-decoration-none">
+        <i class="fa fa-cc-mastercard me-2"></i>Gestión de Datos Maestros
+      </a>
+      /
+      <a href="/admin/task-type">Tipos de Tarea</a>
+      /
+      Editar Tipo de Tarea
+    </h3>
+
+    <%= render 'partials/flash_messages' %>
+
+    <div class="card mb-4">
+
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-edit me-2"></i>
+          Editar Tipo de Tarea: <%= @task_type.name %>
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <form action="/admin/task-type/<%= @task_type.id %>"
+              method="POST"
+              class="row g-3">
+
+          <!-- Rails method override -->
+          <input type="hidden" name="_method" value="PUT">
+
+          <!-- CSRF -->
+          <input type="hidden"
+                 name="authenticity_token"
+                 value="<%= form_authenticity_token %>">
+
+          <div class="col-md-4">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text"
+                   id="name"
+                   name="name"
+                   class="form-control"
+                   maxlength="30"
+                   value="<%= @task_type.name %>"
+                   required>
+          </div>
+
+          <div class="col-12 mt-4">
+
+            <button type="submit" class="btn btn-success">
+              <i class="fa fa-save me-2"></i>Guardar cambios
+            </button>
+
+            <a href="/admin/task-type" class="btn btn-warning ms-2">
+              <i class="fa fa-times me-2"></i>Cancelar
+            </a>
+
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</main>
