@@ -203,9 +203,8 @@ class AbetService < ApplicationService
         data: {
           zip_path: zip_path,
           folder: main_folder.to_s,
-          successful: successful,
-          failed: failed,
-          total: students.count
+          total: students.count,
+          students: students
         }
       )
     rescue => e
@@ -214,11 +213,7 @@ class AbetService < ApplicationService
       build_response(
         success: false,
         message: "Error al comprimir: #{e.message}",
-        data: {
-          folder: main_folder.to_s,
-          successful: successful,
-          failed: failed
-        }
+        data: nil
       )
     end
   end
@@ -337,25 +332,5 @@ class AbetService < ApplicationService
     
     puts "   ✅ ZIP creado: #{File.basename(zip_path)}"
     puts "   📦 Tamaño: #{File.size(zip_path)} bytes"
-  end
-
-  def self.build_response(success:, message:, data: {})
-    {
-      success: success,
-      message: message,
-      data: data,
-      timestamp: Time.current
-    }
-  end
-
-  def self.handle_error(message, backtrace)
-    puts "❌ ERROR: #{message}"
-    puts backtrace.join("\n") if backtrace
-    
-    build_response(
-      success: false,
-      message: message,
-      data: { backtrace: backtrace&.first(5) }
-    )
   end
 end

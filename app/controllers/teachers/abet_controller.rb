@@ -22,7 +22,8 @@ module Teachers
 
     def groups_generate
       @nav_link = 'abet'
-      resp = AbetService.generate_evidences(params)
+      abet_resp = AbetService.generate_evidences(params)
+      resp = TastService.create(params, abet_resp)
 
       if resp[:success]
         #@user = resp[:data]

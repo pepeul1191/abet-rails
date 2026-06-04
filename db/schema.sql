@@ -22,7 +22,6 @@ CREATE INDEX idx_users_provider ON users(provider);
 CREATE INDEX idx_users_uid ON users(uid);
 CREATE INDEX idx_users_last_login_at ON users(last_login_at);
 CREATE INDEX idx_users_provider_uid ON users(provider, uid);
-CREATE TABLE IF NOT EXISTS "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 CREATE TABLE periods (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(10) NOT NULL
@@ -38,7 +37,7 @@ CREATE TABLE tasks (
     name VARCHAR(40) NOT NULL,
     description TEXT,
     data TEXT,
-    document_url VARCHAR(255),
+    zip_path VARCHAR(255),
     status VARCHAR(20),
     user_id INTEGER NOT NULL, -- Asumo que no debe ser nulo por ser FK
     task_type_id INTEGER NOT NULL,
@@ -56,4 +55,6 @@ INSERT INTO "schema_migrations" (version) VALUES
   ('20260522204052'),
   ('20260522204107'),
   ('20260522204115'),
-  ('20260522204218');
+  ('20260522204218'),
+  ('20260603013009'),
+  ('20260604012322');
