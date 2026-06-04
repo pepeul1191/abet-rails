@@ -24,24 +24,48 @@ class AbetService < ApplicationService
     if csv_file.present?
       csv_content = csv_file.read
       
-      # Intentar detectar y corregir codificación
-      begin
-        # Primero intentar como Windows-1252 (común en Excel)
-        csv_text = csv_content.force_encoding('Windows-1252').encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
-      rescue
-        # Si falla, usar UTF-8 y limpiar caracteres inválidos
-        csv_text = csv_content.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
-      end
-
-      csv = CSV.parse(csv_text, headers: true)
-      students = csv.map(&:to_h)
+      # IMPORTANTE: Probar diferentes codificaciones
+      csv_text = nil
       
-      # Limpiar codificación de todos los valores del CSV
-      students.each do |student|
-        student.each do |key, value|
-          student[key] = normalize_encoding(value.to_s) if value.is_a?(String)
+      # Intentar con UTF-8 primero
+      begin
+        csv_text = csv_content.force_encoding('UTF-8')
+        csv_text = csv_text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+      rescue
+        # Si falla, intentar con Windows-1252
+        begin
+          csv_text = csv_content.force_encoding('Windows-1252').encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+        rescue
+          # Último recurso: limpiar caracteres inválidos
+          csv_text = csv_content.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
         end
       end
+      
+      # Asegurarse de que los acentos se corrijan
+      # Reemplazar secuencias mal decodificadas
+      accent_fixes = {
+        'Ã' => 'Á',
+        'Ã©' => 'é',
+        'Ã­' => 'í',
+        'Ã³' => 'ó',
+        'Ãº' => 'ú',
+        'Ã±' => 'ñ',
+        'Ã‘' => 'Ñ',
+        'Ã‰' => 'É',
+        'Ã“' => 'Ó',
+        'Ãš' => 'Ú',
+        'Ã' => 'Í',
+        'Â' => '',
+        'Ã' => 'Í'  # Caso específico para Í
+      }
+      
+      accent_fixes.each do |wrong, correct|
+        csv_text.gsub!(wrong, correct)
+      end
+      
+      # Usar símbolos como headers
+      csv = CSV.parse(csv_text, headers: true, header_converters: :symbol)
+      students = csv.map(&:to_h)
     end
 
     # =========================
@@ -50,12 +74,14 @@ class AbetService < ApplicationService
     document_file = params[:document]
     document_path = nil
     timestamp_dir = nil
+    pdf_final_name = nil
 
     if document_file.present?
       timestamp_dir = Rails.root.join("tmp", "abet", Time.now.to_i.to_s)
       FileUtils.mkdir_p(timestamp_dir)
 
       original_name = document_file.original_filename
+      pdf_final_name = File.basename(original_name, '.*')
       full_path = timestamp_dir.join(original_name)
 
       File.open(full_path, "wb") do |file|
@@ -65,82 +91,68 @@ class AbetService < ApplicationService
       document_path = full_path.to_s
     end
 
+    result = nil
     case task_type_id.to_i
-    when 1 # Trabajo Grupal
-      return groups_pdfs(students, document_file, timestamp_dir, document_path)
-    when "aprobado"
-      puts "Aprobado"
-    when "rechazado"
-      puts "Rechazado"
+    when 1
+      result = groups_pdfs(students, document_path, timestamp_dir, pdf_final_name)
+    else
+      result = build_response(success: false, message: "Tipo de tarea no soportado")
     end
+    
+    result
   rescue => e
     handle_error("Error al generar las evidencias: #{e.message}", e.backtrace)
   end
 
   private
 
-  def self.groups_pdfs(students, document_file, timestamp_dir, document_path)
-    pdf_final_name = document_file.original_filename
-    
-    # =========================
-    # Carpeta principal dentro del timestamp
-    # =========================
+  def self.groups_pdfs(students, document_path, timestamp_dir, pdf_final_name)
     main_folder = timestamp_dir
     
     puts "\n🚀 Iniciando generación de PDFs"
     puts "📁 Carpeta principal: #{main_folder}"
     puts "=" * 60
 
+    temp_word_folder = File.join(main_folder, 'temp_word_files')
+    FileUtils.mkdir_p(temp_word_folder)
+
     successful = 0
     failed = 0
 
     students.each do |student|
-      # Obtener nombre del estudiante y normalizarlo
-      student_name_raw = student["alumno"]
-      student_name = normalize_encoding(student_name_raw)
+      # Obtener y limpiar el nombre del estudiante
+      alumno_name_raw = student[:alumno].to_s.strip
       
-      puts "\n📝 Nombre original: #{student_name_raw}"
-      puts "📝 Nombre normalizado: #{student_name}"
+      # Limpiar caracteres mal decodificados
+      alumno_name = fix_encoding(alumno_name_raw)
       
-      next if student_name.empty?
+      next if alumno_name.empty?
 
-      # Crear nombre de carpeta (reemplazar coma por espacio, CONSERVAR acentos)
-      folder_name = create_folder_name(student_name)
-
-      puts "📁 Nombre de carpeta: #{folder_name}"
-
+      folder_name = sanitize_filename(alumno_name)
+      
+      puts "\n📄 Procesando: #{alumno_name}"
+      puts "   📁 Nombre de carpeta: #{folder_name}"
+      
       student_folder = File.join(main_folder, folder_name)
       FileUtils.mkdir_p(student_folder)
-
-      temp_docx = File.join(
-        main_folder,
-        "#{folder_name}_#{pdf_final_name}.docx"
-      )
-
-      pdf_path = File.join(
-        student_folder,
-        "#{folder_name} - #{pdf_final_name}.pdf"
-      )
-
-      # Preparar reemplazos con codificación normalizada
+      
+      temp_docx = File.join(temp_word_folder, "#{folder_name}_#{pdf_final_name}.docx")
+      pdf_path = File.join(student_folder, "#{folder_name} - #{pdf_final_name}.pdf")
+      
+      # Preparar reemplazos con valores limpios
       reemplazos = {}
       student.each do |key, value|
-        reemplazos[normalize_encoding(key.to_s)] = normalize_encoding(value.to_s)
+        key_clean = fix_encoding(key.to_s)
+        value_clean = fix_encoding(value.to_s)
+        reemplazos[key_clean] = value_clean
       end
-
+      
       begin
-        # Usar document_path en lugar de document_file.path
         reemplazar_en_docx(document_path, temp_docx, reemplazos)
-
-        system(
-          "libreoffice --headless --convert-to pdf --outdir \"#{student_folder}\" \"#{temp_docx}\""
-        )
-
-        generated_pdf = File.join(
-          student_folder,
-          "#{File.basename(temp_docx, '.docx')}.pdf"
-        )
-
+        
+        system("libreoffice --headless --convert-to pdf --outdir \"#{student_folder}\" \"#{temp_docx}\"")
+        
+        generated_pdf = File.join(student_folder, "#{folder_name}_#{pdf_final_name}.pdf")
         if File.exist?(generated_pdf)
           File.rename(generated_pdf, pdf_path) if generated_pdf != pdf_path
           puts "   ✅ PDF generado exitosamente"
@@ -149,114 +161,128 @@ class AbetService < ApplicationService
           puts "   ❌ No se generó el PDF"
           failed += 1
         end
-
+        
         File.delete(temp_docx) if File.exist?(temp_docx)
-
+        
       rescue => e
         puts "   ❌ Error: #{e.message}"
         failed += 1
       end
     end
-
-    puts "\n📊 Resumen:"
+    
+    # Limpiar carpeta temporal
+    begin
+      Dir.rmdir(temp_word_folder) if Dir.exist?(temp_word_folder) && Dir.empty?(temp_word_folder)
+    rescue
+    end
+    
+    puts "\n" + "=" * 60
+    puts "✨ Proceso completado!"
+    puts "📊 Resumen:"
     puts "   ✅ Exitosos: #{successful}"
     puts "   ❌ Fallidos: #{failed}"
-    puts "   📁 Carpeta: #{main_folder}"
-
-    # =========================
-    # Generar ZIP dentro del mismo folder
-    # =========================
-    zip_path = File.join(main_folder, "rubricas.zip")
-    zip_folder(main_folder, zip_path)
-
-    puts "\n📦 ZIP generado:"
-    puts "   📍 #{zip_path}"
-    puts "   📏 Tamaño: #{File.size(zip_path)} bytes"
+    puts "📁 Ubicación: #{main_folder}"
+    puts "=" * 60
     
-    build_response(
-      success: true,
-      message: "Evidencias generadas correctamente",
-      data: {
-        zip_path: zip_path,
-        folder: main_folder,
-        successful: successful,
-        failed: failed
-      }
-    )
-  rescue => e
-    handle_error("Error al generar las evidencias: #{e.message}", e.backtrace)
-  end
-
-  # =========================
-  # HELPERS DE CODIFICACIÓN
-  # =========================
-
-  def self.normalize_encoding(text)
-    return '' if text.nil?
+    # Comprimir
+    puts "\n🗜️  Comprimiendo carpeta..."
+    zip_path = File.join(main_folder, "rubricas.zip")
     
     begin
-      # Forzar a UTF-8 limpiando bytes inválidos
-      utf8_text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      zip_folder(main_folder, zip_path)
       
-      # Corregir casos comunes de doble codificación
-      # Específicamente para el caso de Í que se convierte en Ã
-      if utf8_text.include?('Ã')
-        utf8_text = utf8_text.gsub('Ã', 'Í')
-      end
+      puts "\n" + "=" * 60
+      puts "✅ ¡PROCESO COMPLETADO!"
+      puts "📦 Archivo ZIP generado: #{zip_path}"
+      puts "📏 Tamaño: #{File.size(zip_path)} bytes"
+      puts "=" * 60
       
-      utf8_text
+      build_response(
+        success: true,
+        message: "Evidencias generadas correctamente",
+        data: {
+          zip_path: zip_path,
+          folder: main_folder.to_s,
+          successful: successful,
+          failed: failed,
+          total: students.count
+        }
+      )
     rescue => e
-      # Si todo falla, devolver el texto original limpiado
-      text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      puts "❌ Error al comprimir: #{e.message}"
+      
+      build_response(
+        success: false,
+        message: "Error al comprimir: #{e.message}",
+        data: {
+          folder: main_folder.to_s,
+          successful: successful,
+          failed: failed
+        }
+      )
     end
   end
 
-  def self.create_folder_name(name)
-    # Crear nombre de carpeta: CONSERVAR acentos, solo reemplazar coma por espacio
-    return '' if name.nil? || name.empty?
+  # =========================
+  # FUNCIÓN CRÍTICA: Corregir codificación
+  # =========================
+  
+  def self.fix_encoding(text)
+    return '' if text.nil? || text.empty?
     
-    # Normalizar primero
-    name = normalize_encoding(name)
+    result = text.dup
     
-    # Reemplazar coma por espacio
-    name = name.gsub(',', ' ')
+    # Mapeo de caracteres mal codificados a correctos
+    replacements = {
+      'Ã' => 'Í',
+      'Ã©' => 'é',
+      'Ã­' => 'í', 
+      'Ã³' => 'ó',
+      'Ãº' => 'ú',
+      'Ã±' => 'ñ',
+      'Ã‘' => 'Ñ',
+      'Ã‰' => 'É',
+      'Ã“' => 'Ó',
+      'Ãš' => 'Ú',
+      'Ã' => 'Í',
+      'Ã¡' => 'á',
+      'Ã?' => 'í', # Caso genérico
+      'BENÃTEZ' => 'BENÍTEZ',
+      'ADRIÃN' => 'ADRIÁN',
+      'JULIÃN' => 'JULIÁN'
+    }
     
-    # Reemplazar espacios múltiples por uno solo
-    name = name.gsub(/\s+/, ' ')
-    
-    # Recortar espacios al inicio y final
-    name = name.strip
-    
-    # Si el nombre está vacío después de limpiar, usar un default
-    if name.empty?
-      name = "estudiante_sin_nombre"
+    replacements.each do |wrong, correct|
+      result.gsub!(wrong, correct)
     end
     
-    name
+    # Si todavía hay Ã, reemplazar por Í (caso común)
+    result.gsub!('Ã', 'Í') if result.include?('Ã')
+    
+    result
   end
 
   def self.sanitize_filename(name)
-    # Solo para nombres de archivo, no para carpetas
-    # Reemplazar caracteres problemáticos para sistemas de archivos
-    name = name.gsub(/[\/\\:*?"<>|]/, '_')
-    name = name.gsub(/\s+/, ' ')
-    name.strip
+    # Primero limpiar la codificación
+    clean_name = fix_encoding(name)
+    
+    # Reemplazar la coma por espacio (no por _)
+    clean_name = clean_name.gsub(',', ' ')
+    
+    # Reemplazar cualquier otro caracter problemático por _
+    clean_name = clean_name.gsub(/[\/\\:*?"<>|]/, '_')
+    
+    # Reemplazar cualquier secuencia de espacios y/o guiones bajos por un SOLO espacio
+    clean_name = clean_name.gsub(/[\s_]+/, ' ')
+    
+    # Recortar espacios al inicio y final
+    clean_name = clean_name.strip
+    
+    clean_name
   end
-
-  # =========================
-  # HELPERS DE DOCX
-  # =========================
 
   def self.reemplazar_en_docx(input_path, output_path, reemplazos)
     temp_file = Tempfile.new(['temp', '.docx'], binmode: true)
-
-    # Limpiar y normalizar todos los reemplazos antes de procesar
-    reemplazos_limpios = {}
-    reemplazos.each do |clave, valor|
-      clave_limpia = normalize_encoding(clave.to_s)
-      valor_limpio = normalize_encoding(valor.to_s)
-      reemplazos_limpios[clave_limpia] = valor_limpio
-    end
 
     Zip::File.open(input_path) do |zip_file|
       Zip::OutputStream.open(temp_file.path) do |output_zip|
@@ -265,28 +291,24 @@ class AbetService < ApplicationService
           
           if entry.name.end_with?('.xml', '.rels')
             begin
-              # Intentar procesar como UTF-8
               contenido_utf8 = contenido.dup.force_encoding('UTF-8')
               unless contenido_utf8.valid_encoding?
                 contenido_utf8 = contenido_utf8.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
               end
               
-              # Realizar todos los reemplazos
-              reemplazos_limpios.each do |clave, valor|
+              reemplazos.each do |clave, valor|
                 placeholder = "{{#{clave}}}"
-                contenido_utf8.gsub!(placeholder, valor)
+                valor_limpio = fix_encoding(valor.to_s)
+                contenido_utf8.gsub!(placeholder, valor_limpio)
               end
               
               output_zip.put_next_entry(entry.name)
               output_zip.write(contenido_utf8.force_encoding('ASCII-8BIT'))
             rescue => e
-              # Si falla, escribir el contenido original
-              puts "   ⚠️ Error procesando #{entry.name}: #{e.message}"
               output_zip.put_next_entry(entry.name)
               output_zip.write(contenido)
             end
           else
-            # Archivos no XML se copian tal cual
             output_zip.put_next_entry(entry.name)
             output_zip.write(contenido)
           end
@@ -297,58 +319,43 @@ class AbetService < ApplicationService
     temp_file.close
     FileUtils.cp(temp_file.path, output_path)
     temp_file.unlink
-  rescue => e
-    raise "Error al reemplazar en docx: #{e.message}"
   end
 
-  # =========================
-  # HELPERS DE ARCHIVOS
-  # =========================
-
-  def self.zip_folder(source, destination)
-    # Verificar que la carpeta origen existe
-    unless Dir.exist?(source)
-      raise "La carpeta origen no existe: #{source}"
-    end
+  def self.zip_folder(folder_path, zip_path)
+    puts "   📦 Comprimiendo carpeta: #{File.basename(folder_path)}"
     
-    # Cambiar al directorio origen y crear el zip
-    Dir.chdir(source) do
-      # Usar el comando zip de sistema (más confiable)
-      system("zip -r \"#{destination}\" . > /dev/null 2>&1")
-      
-      unless File.exist?(destination)
-        # Fallback: usar RubyZip si el comando falla
-        require 'zip'
-        Zip::File.open(destination, Zip::File::CREATE) do |zipfile|
-          Dir[File.join('.', '**', '**')].each do |file|
-            next if File.directory?(file)
-            zipfile.add(file, file)
-          end
-        end
-      end
-    end
-  end
-
-  def self.cleanup_temp_folder(folder)
-    return unless Dir.exist?(folder)
+    entries = Dir.glob(File.join(folder_path, '**', '*'))
     
-    # Eliminar archivos temporales .docx
-    Dir.glob(File.join(folder, "*.docx")).each do |temp_file|
-      File.delete(temp_file) if File.exist?(temp_file)
-    end
-    
-    # Eliminar carpetas vacías
-    Dir.glob(File.join(folder, "*")).each do |subfolder|
-      if File.directory?(subfolder) && Dir.empty?(subfolder)
-        Dir.rmdir(subfolder)
+    Zip::File.open(zip_path, create: true) do |zipfile|
+      entries.each do |file|
+        next if File.directory?(file)
+        
+        relative_path = file.sub("#{folder_path}/", '')
+        zipfile.add(relative_path, file)
       end
     end
     
-    # Eliminar la carpeta principal si está vacía
-    if Dir.exist?(folder) && Dir.empty?(folder)
-      Dir.rmdir(folder)
-    end
-  rescue => e
-    puts "   ⚠️ Error limpiando carpeta temporal: #{e.message}"
+    puts "   ✅ ZIP creado: #{File.basename(zip_path)}"
+    puts "   📦 Tamaño: #{File.size(zip_path)} bytes"
+  end
+
+  def self.build_response(success:, message:, data: {})
+    {
+      success: success,
+      message: message,
+      data: data,
+      timestamp: Time.current
+    }
+  end
+
+  def self.handle_error(message, backtrace)
+    puts "❌ ERROR: #{message}"
+    puts backtrace.join("\n") if backtrace
+    
+    build_response(
+      success: false,
+      message: message,
+      data: { backtrace: backtrace&.first(5) }
+    )
   end
 end
