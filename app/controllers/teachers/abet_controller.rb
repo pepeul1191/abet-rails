@@ -13,24 +13,24 @@ module Teachers
       @nav_link = 'abet'
     end
 
-    def groups_new
+    def folders_evidences
       @nav_link = 'abet'
       @periods = PeriodService.fetch_all
       @task_types = TaskType.all.order(name: :asc)
-      render 'teachers/abet/new-group'
+      render 'teachers/abet/folders-evidences'
     end
 
-    def groups_generate
+    def folders_evidences_generate
       @nav_link = 'abet'
       abet_resp = AbetService.generate_evidences(params)
-      resp = TastService.create(params, abet_resp)
+      resp = TaskService.create(params, abet_resp, session)
 
       if resp[:success]
-        #@user = resp[:data]
-        redirect_to '/teachers/abet'
+        task = resp[:data]
+        redirect_to "/teachers/abet/tasks/#{task.id}"
       else
         flash[:alert] = resp[:message]
-        redirect_to '/teachers/abet/groups/new'
+        render 'teachers/abet/folders-evidences'
       end
     end
   end

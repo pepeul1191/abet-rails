@@ -1,4 +1,7 @@
 # app/services/task_service.rb
+
+require 'pathname'
+
 class TaskService < ApplicationService
   def self.fetch_one(id)
     specialism = Specialism.find_by(id: id)
@@ -46,27 +49,31 @@ class TaskService < ApplicationService
   end
 
 
-  def self.create(params, abet_resp)
+  def self.create(params, abet_resp, session)
     task = Task.new
 
     task.name = params[:name]
     task.description = params[:description]
     task.data = abet_resp['']
-    task.zip_path = "/files/task1.zip"
-    task.status = "pending"
-    task.user_id = 1
-    task.task_type_id = 2
-    task.period_id = 3
+    task.zip_path = Pathname
+      .new(abet_resp[:data][:zip_path])
+      .relative_path_from(Rails.root)
+      .to_s
+    task.status = "Success"
+    task.user_id = session['user']['id']
+    task.task_type_id = params[:task_type_id]
+    task.period_id = params[:period_id]
+    task.data = abet_resp.dig(:data, :students).to_json
 
     task.save
 
-    if specialism.save
-      build_response(data: specialism, message: "Especialidad creada exitosamente")
+    if task.save
+      build_response(data: task, message: "Tarea creada exitosamente")
     else
-      handle_validation_error(specialism)
+      handle_validation_error(task)
     end
   rescue => e
-    handle_error("Error al crear especialidad: #{e.message}", e.backtrace)
+    handle_error("Error al crear evidencia ABET: #{e.message}", e.backtrace)
   end
 
   def self.delete(id)

@@ -75,8 +75,8 @@ Rails.application.routes.draw do
   namespace :teachers do
     get '/', to: 'home#index'
     get '/abet', to: 'abet#index'
-    get '/abet/groups/new', to: 'abet#groups_new'
-    post '/abet/gropus', to: 'abet#groups_generate'
+    get '/abet/folders-evidences/new', to: 'abet#folders_evidences'
+    post '/abet/folders-evidences', to: 'abet#folders_evidences_generate'
   end
 
   match '*unmatched', to: 'errors#not_found', via: :all
