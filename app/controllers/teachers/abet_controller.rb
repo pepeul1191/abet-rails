@@ -33,6 +33,29 @@ module Teachers
         render 'teachers/abet/folders-evidences'
       end
     end
+
+    def show_task
+      @nav_link = 'abet'
+      @task = Task.find_by(id: params[:id])
+      if @task
+        render 'teachers/abet/task'
+      else
+        flash[:alert] = "Tarea no encontrada"
+        redirect_to "/teachers/abet"
+      end
+    end
+
+    def download_evidences
+      @nav_link = 'abet'
+      task = Task.find_by(id: params[:id])
+      
+      if task && File.exist?(task.zip_path)
+        send_file task.zip_path, filename: File.basename(task.zip_path), type: 'application/zip'
+      else
+        flash[:alert] = "Archivo no encontrado"
+        redirect_to "/teachers/abet/tasks/#{params[:id]}"
+      end
+    end
   end
 end
 

@@ -41,7 +41,7 @@ CREATE TABLE tasks (
     status VARCHAR(20),
     user_id INTEGER NOT NULL, -- Asumo que no debe ser nulo por ser FK
     task_type_id INTEGER NOT NULL,
-    period_id INTEGER NOT NULL,
+    period_id INTEGER NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (task_type_id) REFERENCES task_types(id) ON DELETE RESTRICT,
     FOREIGN KEY (period_id) REFERENCES periods(id) ON DELETE RESTRICT
 );
@@ -57,4 +57,5 @@ INSERT INTO "schema_migrations" (version) VALUES
   ('20260522204115'),
   ('20260522204218'),
   ('20260603013009'),
-  ('20260604012322');
+  ('20260604012322'),
+  ('20260604141544');

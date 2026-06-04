@@ -1,0 +1,140 @@
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <i class="fa fa-tasks me-2"></i>
+      Detalle Task #<%= @task.id %>
+    </h3>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-info-circle me-2"></i>
+          Información de la Task
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <div class="row g-3">
+
+          <!-- NAME -->
+          <div class="col-md-6">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control"
+                   value="<%= @task.name %>" disabled>
+          </div>
+
+          <!-- STATUS -->
+          <div class="col-md-3">
+            <label class="form-label">Estado</label>
+            <input type="text" class="form-control"
+                   value="<%= @task.status %>" disabled>
+          </div>
+
+          <!-- USER -->
+          <div class="col-md-3">
+            <label class="form-label">Usuario ID</label>
+            <input type="text" class="form-control"
+                   value="<%= @task.user_id %>" disabled>
+          </div>
+
+          <!-- TASK TYPE -->
+          <div class="col-md-4">
+            <label class="form-label">Tipo de Tarea</label>
+            <input type="text" class="form-control"
+                   value="<%= @task.task_type_id %>" disabled>
+          </div>
+
+          <!-- PERIOD -->
+          <div class="col-md-4">
+            <label class="form-label">Periodo</label>
+            <input type="text" class="form-control"
+                   value="<%= @task.period_id %>" disabled>
+          </div>
+
+          <!-- DOCUMENT -->
+          <div class="col-md-4">
+            <label class="form-label">Documento</label>
+
+            <a href="/teachers/abet/tasks/<%= @task.id %>/evidences"
+              class="btn btn-primary w-100"
+              target="_blank">
+              <i class="fa fa-download me-2"></i>
+              Descargar ZIP
+            </a>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="col-12">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" rows="3" disabled><%= @task.description %></textarea>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DATA TABLE -->
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0">
+          <i class="fa fa-table me-2"></i>
+          Datos de Alumnos
+        </h6>
+      </div>
+
+      <div class="card-body">
+
+        <% rows = JSON.parse(@task.data || "[]") %>
+
+        <% if rows.any? %>
+
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+
+              <thead class="table-dark">
+                <tr>
+                  <th>Código</th>
+                  <th>Nombre completo</th>
+                  <th>Alumno</th>
+                  <th>Sección</th>
+                  <th>Nota</th>
+                  <th>P1</th>
+                  <th>P2</th>
+                  <th>P3</th>
+                  <th>P4</th>
+                  <th>P5</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% rows.each do |r| %>
+                  <tr>
+                    <td><%= r["codigo"] %></td>
+                    <td><%= r["nombrecompleto"] %></td>
+                    <td><%= r["alumno"] %></td>
+                    <td><%= r["seccion"] %></td>
+                    <td><%= r["nota"] %></td>
+                    <td><%= r["p1"] %></td>
+                    <td><%= r["p2"] %></td>
+                    <td><%= r["p3"] %></td>
+                    <td><%= r["p4"] %></td>
+                    <td><%= r["p5"] %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+
+            </table>
+          </div>
+
+        <% else %>
+          <p class="text-muted">No hay datos disponibles.</p>
+        <% end %>
+
+      </div>
+    </div>
+
+  </div>
+</main>

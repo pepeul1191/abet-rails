@@ -77,6 +77,8 @@ Rails.application.routes.draw do
     get '/abet', to: 'abet#index'
     get '/abet/folders-evidences/new', to: 'abet#folders_evidences'
     post '/abet/folders-evidences', to: 'abet#folders_evidences_generate'
+    get '/abet/tasks/:id', to: 'abet#show_task'
+    get '/abet/tasks/:id/evidences', to: 'abet#download_evidences'
   end
 
   match '*unmatched', to: 'errors#not_found', via: :all
