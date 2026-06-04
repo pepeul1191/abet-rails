@@ -2,7 +2,9 @@
   <div class="container-fluid">
 
     <h3 class="mb-4">
-      <i class="fa fa-tasks me-2"></i>
+      <a href="/teachers/abet">
+        <i class="fa fa-book me-2"></i>Evidencias ABET
+      </a> / 
       Detalle de Tarea #<%= @task.id %>
     </h3>
 
@@ -99,37 +101,25 @@
 
         <% if rows.any? %>
 
+          <% headers = rows.first.keys %>
+
           <div class="table-responsive">
             <table class="table table-bordered table-striped table-hover">
 
               <thead class="table-dark">
                 <tr>
-                  <th>Código</th>
-                  <th>Nombre completo</th>
-                  <th>Alumno</th>
-                  <th>Sección</th>
-                  <th>Nota</th>
-                  <th>P1</th>
-                  <th>P2</th>
-                  <th>P3</th>
-                  <th>P4</th>
-                  <th>P5</th>
+                  <% headers.each do |header| %>
+                    <th><%= header.humanize %></th>
+                  <% end %>
                 </tr>
               </thead>
 
               <tbody>
-                <% rows.each do |r| %>
+                <% rows.each do |row| %>
                   <tr>
-                    <td><%= r["codigo"] %></td>
-                    <td><%= r["nombrecompleto"] %></td>
-                    <td><%= r["alumno"] %></td>
-                    <td><%= r["seccion"] %></td>
-                    <td><%= r["nota"] %></td>
-                    <td><%= r["p1"] %></td>
-                    <td><%= r["p2"] %></td>
-                    <td><%= r["p3"] %></td>
-                    <td><%= r["p4"] %></td>
-                    <td><%= r["p5"] %></td>
+                    <% headers.each do |header| %>
+                      <td><%= row[header] %></td>
+                    <% end %>
                   </tr>
                 <% end %>
               </tbody>

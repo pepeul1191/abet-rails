@@ -5,7 +5,7 @@ class Task < ApplicationRecord
 
   validates :name, presence: true, length: { maximum: 40 }
   validates :status, length: { maximum: 20 }, allow_blank: true
-  validates :document_url, length: { maximum: 255 }, allow_blank: true
+  validates :zip_path, length: { maximum: 255 }, allow_blank: true
 
   # helper para JSON de data
   def data_rows

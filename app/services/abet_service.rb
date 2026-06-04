@@ -186,7 +186,7 @@ class AbetService < ApplicationService
     
     # Comprimir
     puts "\n🗜️  Comprimiendo carpeta..."
-    zip_path = File.join(main_folder, "rubricas.zip")
+    zip_path = File.join(main_folder, "evidencias.zip")
     
     begin
       zip_folder(main_folder, zip_path)

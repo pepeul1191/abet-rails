@@ -4,6 +4,9 @@ require 'pathname'
 
 class TaskService < ApplicationService
   def self.fetch_all(user_id:, page: 1, per_page: 10, search_query: nil, task_type_id: nil, start_date: nil, end_date: nil)
+    puts 'A -------------------------------------'
+    puts 'user_id: #{user_id}'
+    puts 'B -------------------------------------'
     begin
       tasks = Task
                 .includes(:user, :task_type, :period)

@@ -23,7 +23,7 @@ module Teachers
       page = 1 if page < 1
       per_page = 10 if per_page < 1
 
-      user_id = session[:user][:id]
+      user_id = session['user']['id']
 
       result = TaskService.fetch_all(
         user_id: user_id,
@@ -34,10 +34,6 @@ module Teachers
         start_date: start_date,
         end_date: end_date
       )
-
-      puts '1 +++++++++++++++++++++++++++++++++++++++++++++++'
-      puts result.inspect
-      puts '2 +++++++++++++++++++++++++++++++++++++++++++++++'
 
       if result[:success]
         @tasks = result[:data][:tasks]
@@ -72,6 +68,9 @@ module Teachers
         task = resp[:data]
         redirect_to "/teachers/abet/tasks/#{task.id}"
       else
+        @nav_link = 'abet'
+        @periods = PeriodService.fetch_all
+        @task_types = TaskType.all.order(name: :asc)
         flash[:alert] = resp[:message]
         render 'teachers/abet/folders-evidences'
       end

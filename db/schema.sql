@@ -45,6 +45,7 @@ CREATE TABLE tasks (
     FOREIGN KEY (task_type_id) REFERENCES task_types(id) ON DELETE RESTRICT,
     FOREIGN KEY (period_id) REFERENCES periods(id) ON DELETE RESTRICT
 );
+CREATE TABLE IF NOT EXISTS "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL);
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES
   ('20260409125609'),
