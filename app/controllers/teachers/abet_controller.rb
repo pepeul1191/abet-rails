@@ -11,6 +11,49 @@ module Teachers
     # Agrega aquí la lógica de tu controlador
     def index
       @nav_link = 'abet'
+
+      page = params[:page]&.to_i || 1
+      per_page = params[:per_page]&.to_i || 10
+      search_query = params[:name]
+
+      task_type_id = params[:task_type_id]
+      start_date = params[:start_date]
+      end_date = params[:end_date]
+
+      page = 1 if page < 1
+      per_page = 10 if per_page < 1
+
+      user_id = session[:user][:id]
+
+      result = TaskService.fetch_all(
+        user_id: user_id,
+        page: page,
+        per_page: per_page,
+        search_query: search_query,
+        task_type_id: task_type_id,
+        start_date: start_date,
+        end_date: end_date
+      )
+
+      puts '1 +++++++++++++++++++++++++++++++++++++++++++++++'
+      puts result.inspect
+      puts '2 +++++++++++++++++++++++++++++++++++++++++++++++'
+
+      if result[:success]
+        @tasks = result[:data][:tasks]
+        @pagination = result[:data][:pagination]
+        @search_query = search_query
+        @task_type_id = task_type_id
+        @start_date = start_date
+        @end_date = end_date
+      else
+        @tasks = []
+        @pagination = { page: page, per_page: per_page, total_tasks: 0, total_pages: 0, start_record: 0, end_record: 0 }
+        flash.now[:alert] = result[:message]
+      end
+
+      @task_types = TaskType.all
+      render 'teachers/abet/index'
     end
 
     def folders_evidences

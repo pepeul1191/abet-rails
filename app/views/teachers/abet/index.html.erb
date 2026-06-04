@@ -1,3 +1,8 @@
+<h3 class="mb-4">
+  <i class="fa fa-tasks me-2"></i>
+  Mis Tasks
+</h3>
+
 <div class="row g-4">
 
   <!-- Ejercicios Colaborativos -->
@@ -140,3 +145,179 @@
     }
   </style>
 <% end %>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h6 class="mb-0">
+      <i class="fa fa-filter me-2"></i>
+      Filtros
+    </h6>
+  </div>
+
+  <div class="card-body">
+    <form method="GET" action="/teachers/abet">
+      <input type="hidden" name="per_page" value="<%= @pagination[:per_page] %>">
+
+      <div class="row mb-3 align-items-end">
+
+        <!-- NAME -->
+        <div class="col-md-3">
+          <label class="form-label">Nombre</label>
+          <input type="text"
+                name="name"
+                class="form-control"
+                value="<%= @search_query %>">
+        </div>
+
+        <!-- TASK TYPE -->
+        <div class="col-md-3">
+          <label class="form-label">Tipo de Task</label>
+          <select name="task_type_id" class="form-select">
+            <option value="">Todos</option>
+            <% @task_types.each do |tt| %>
+              <option value="<%= tt.id %>"
+                <%= "selected" if @task_type_id.to_s == tt.id.to_s %>>
+                <%= tt.name %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+
+        <!-- START DATE -->
+        <div class="col-md-2">
+          <label class="form-label">Desde</label>
+          <input type="date"
+                name="start_date"
+                class="form-control"
+                value="<%= @start_date %>">
+        </div>
+
+        <!-- END DATE -->
+        <div class="col-md-2">
+          <label class="form-label">Hasta</label>
+          <input type="date"
+                name="end_date"
+                class="form-control"
+                value="<%= @end_date %>">
+        </div>
+
+        <!-- BUTTON -->
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100">
+            <i class="fa fa-search"></i> Filtrar
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h6 class="mb-0">
+      <i class="fa fa-list me-2"></i>
+      Lista de Tasks
+    </h6>
+  </div>
+
+  <div class="card-body">
+
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Estado</th>
+            <th>Tipo</th>
+            <th>Periodo</th>
+            <th>Fecha</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% if @tasks.any? %>
+            <% @tasks.each do |task| %>
+              <tr>
+                <td><%= task.name %></td>
+                <td><%= task.status %></td>
+                <td><%= task.task_type&.name %></td>
+                <td><%= task.period&.name %></td>
+                <td><%= task.created_at&.strftime('%d/%m/%Y') %></td>
+
+                <td class="text-end">
+                  <a href="/tasks/<%= task.id %>" class="btn btn-sm btn-info">
+                    Ver
+                  </a>
+
+                  <a href="/tasks/<%= task.id %>/edit" class="btn btn-sm btn-warning">
+                    Editar
+                  </a>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="6" class="text-center">
+                No tienes tasks registradas
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+
+      </table>
+    </div>
+
+  <% if @pagination[:total_pages] > 1 %>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+
+      <div class="text-muted">
+        Página <%= @pagination[:page] %> de <%= @pagination[:total_pages] %> -
+        Mostrando registros <%= @pagination[:start_record] %> - <%= @pagination[:end_record] %>
+        de un total de <%= @pagination[:total_tasks] %>
+      </div>
+
+      <nav aria-label="Page navigation">
+        <ul class="pagination mb-0">
+
+          <!-- FIRST -->
+          <li class="page-item <%= 'disabled' if @pagination[:page] == 1 %>">
+            <a class="page-link"
+              href="/tasks?page=1&per_page=<%= @pagination[:per_page] %>&name=<%= @search_query %>">
+              <i class="fa fa-angle-double-left"></i> Primero
+            </a>
+          </li>
+
+          <!-- PREVIOUS -->
+          <li class="page-item <%= 'disabled' if @pagination[:page] == 1 %>">
+            <a class="page-link"
+              href="/tasks?page=<%= @pagination[:page] - 1 %>&per_page=<%= @pagination[:per_page] %>&name=<%= @search_query %>">
+              <i class="fa fa-angle-left"></i> Anterior
+            </a>
+          </li>
+
+          <!-- NEXT -->
+          <li class="page-item <%= 'disabled' if @pagination[:page] == @pagination[:total_pages] %>">
+            <a class="page-link"
+              href="/tasks?page=<%= @pagination[:page] + 1 %>&per_page=<%= @pagination[:per_page] %>&name=<%= @search_query %>">
+              Siguiente <i class="fa fa-angle-right"></i>
+            </a>
+          </li>
+
+          <!-- LAST -->
+          <li class="page-item <%= 'disabled' if @pagination[:page] == @pagination[:total_pages] %>">
+            <a class="page-link"
+              href="/tasks?page=<%= @pagination[:total_pages] %>&per_page=<%= @pagination[:per_page] %>&name=<%= @search_query %>">
+              Último <i class="fa fa-angle-double-right"></i>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+
+    </div>
+  <% end %>
+  </div>
+</div>
