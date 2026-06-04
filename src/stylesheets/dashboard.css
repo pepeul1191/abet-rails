@@ -13,6 +13,10 @@ body.dashboard-layout {
   background-color: var(--bs-primary) !important;
 }
 
+.alert, .modal-content{
+  border-radius: 0px !important;
+}
+
 .sidebar-header h3{
   font-size: 20px;
   margin-left: 15px;

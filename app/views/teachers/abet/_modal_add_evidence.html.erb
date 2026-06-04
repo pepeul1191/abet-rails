@@ -1,0 +1,162 @@
+<div class="modal fade"
+     id="abetModal"
+     tabindex="-1"
+     aria-labelledby="abetModalLabel"
+     aria-hidden="true">
+
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="abetModalLabel">
+          Seleccione el tipo de evidencia
+        </h5>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close">
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="row g-4">
+
+          <!-- Ejercicios Colaborativos -->
+          <div class="col-lg-6">
+            <div class="card abet-card h-100">
+
+              <div class="position-relative">
+                <img src="/img/abet-colaborative.png"
+                     class="card-img-top"
+                     alt="Ejercicios Colaborativos">
+
+                <a href="/teachers/abet/colaboratives/new"
+                   class="btn btn-primary btn-add">
+                  <i class="fa fa-plus"></i>
+                </a>
+              </div>
+
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="fa fa-users me-2"></i>
+                  Ejercicios Colaborativos
+                </h5>
+
+                <p class="text-muted small">
+                  Generación de evidencias de ejercicios colaborativos.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="badge bg-light text-dark border">
+                    PDF de evaluaciones
+                  </span>
+
+                  <span class="badge bg-light text-dark border">
+                    CSV de alumnos
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Folder con Evidencias -->
+          <div class="col-lg-6">
+            <div class="card abet-card h-100">
+
+              <div class="position-relative">
+                <img src="/img/abet-colaborative.png"
+                     class="card-img-top"
+                     alt="Folder con Evidencias">
+
+                <a href="/teachers/abet/folders-evidences/new"
+                   class="btn btn-success btn-add">
+                  <i class="fa fa-plus"></i>
+                </a>
+              </div>
+
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="fa fa-folder me-2"></i>
+                  Folder con Evidencias
+                </h5>
+
+                <p class="text-muted small">
+                  Generación de folders con evidencias.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="badge bg-light text-dark border">
+                    Rúbrica Word
+                  </span>
+
+                  <span class="badge bg-light text-dark border">
+                    CSV de alumnos
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<% content_for :extra_css do %>
+  <style>
+    .abet-card {
+      border: 0;
+      border-radius: 0px;
+      overflow: hidden;
+      transition: all .25s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+
+    .abet-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0,0,0,.15);
+    }
+
+    .abet-card .card-img-top {
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .btn-add {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      box-shadow: 0 4px 12px rgba(13,110,253,.35);
+      font-size: 1.1rem;
+    }
+
+    .card-title {
+      font-weight: 600;
+    }
+
+    .badge {
+      font-weight: 500;
+      padding: .6rem .8rem;
+    }
+
+    a.btn-add i {
+      margin-right: 0;
+      margin-top: 5px;
+    }
+  </style>
+<% end %>

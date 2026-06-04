@@ -191,8 +191,8 @@ h4 {
     border: var(--bs-card-border-width) solid var(--bs-card-border-color) !important;
 }
 
-.alert{
-  border-radius: 0px;
+.alert, .modal-content{
+  border-radius: 0px !important;
 }
 
 .card-header, .card-body{
