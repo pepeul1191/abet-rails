@@ -3,6 +3,7 @@ class User < ApplicationRecord
   has_secure_password
 
   has_many :login_logs, dependent: :destroy
+  has_many :tasks, dependent: :destroy
 
   # Validaciones
   validates :username, presence: true, uniqueness: true, length: { maximum: 20 }

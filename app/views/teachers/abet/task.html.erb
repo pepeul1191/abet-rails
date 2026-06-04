@@ -3,7 +3,7 @@
 
     <h3 class="mb-4">
       <i class="fa fa-tasks me-2"></i>
-      Detalle Task #<%= @task.id %>
+      Detalle de Tarea #<%= @task.id %>
     </h3>
 
     <div class="card mb-4">
@@ -34,28 +34,36 @@
 
           <!-- USER -->
           <div class="col-md-3">
-            <label class="form-label">Usuario ID</label>
+            <label class="form-label">Usuario</label>
             <input type="text" class="form-control"
-                   value="<%= @task.user_id %>" disabled>
+                   value="<%= @task.user.username %>" disabled>
           </div>
 
           <!-- TASK TYPE -->
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">Tipo de Tarea</label>
             <input type="text" class="form-control"
-                   value="<%= @task.task_type_id %>" disabled>
+                   value="<%= @task.task_type.name %>" disabled>
           </div>
 
           <!-- PERIOD -->
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label class="form-label">Periodo</label>
             <input type="text" class="form-control"
-                   value="<%= @task.period_id %>" disabled>
+                   value="<%= @task.period.name %>" disabled>
+          </div>
+
+          <!-- CREATED AT -->
+          <div class="col-md-3">
+            <label class="form-label">Fecha de creación</label>
+            <input type="text" class="form-control"
+                  value="<%= @task.created_at.strftime('%Y-%m-%d %H:%M:%S') if @task.created_at %>"
+                  disabled>
           </div>
 
           <!-- DOCUMENT -->
-          <div class="col-md-4">
-            <label class="form-label">Documento</label>
+          <div class="col-md-3">
+            <label class="form-label">Evidencias</label>
 
             <a href="/teachers/abet/tasks/<%= @task.id %>/evidences"
               class="btn btn-primary w-100"

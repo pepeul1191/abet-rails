@@ -47,7 +47,7 @@ module Teachers
 
     def download_evidences
       @nav_link = 'abet'
-      task = Task.find_by(id: params[:id])
+      task = Task.includes(:user, :task_type, :period).find_by(id: params[:id])
       
       if task && File.exist?(task.zip_path)
         send_file task.zip_path, filename: File.basename(task.zip_path), type: 'application/zip'
