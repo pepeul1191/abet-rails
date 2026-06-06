@@ -1,8 +1,4 @@
-<div class="modal fade"
-     id="abetModal"
-     tabindex="-1"
-     aria-labelledby="abetModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="abetModal" tabindex="-1" aria-labelledby="abetModalLabel" aria-hidden="true">
 
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
@@ -12,10 +8,7 @@
           Seleccione el tipo de evidencia
         </h5>
 
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
         </button>
       </div>
 
@@ -28,24 +21,21 @@
             <div class="card abet-card h-100">
 
               <div class="position-relative">
-                <img src="/img/abet-colaborative.png"
-                     class="card-img-top"
-                     alt="Ejercicios Colaborativos">
+                <img src="/img/abet-colaborative.png" class="card-img-top" alt="Folders de alumnos">
 
-                <a href="/teachers/abet/colaboratives/new"
-                   class="btn btn-primary btn-add">
+                <a href="/teachers/abet/folders/new" class="btn btn-primary btn-add">
                   <i class="fa fa-plus"></i>
                 </a>
               </div>
 
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="fa fa-users me-2"></i>
-                  Ejercicios Colaborativos
+                  <i class="fa fa-folder me-2"></i>
+                  Carpetas con los nombres de los alumnos
                 </h5>
 
                 <p class="text-muted small">
-                  Generación de evidencias de ejercicios colaborativos.
+                  Generación de carpetas con los nombres de los alumnos.
                 </p>
 
                 <div class="d-flex flex-wrap gap-2">
@@ -67,12 +57,9 @@
             <div class="card abet-card h-100">
 
               <div class="position-relative">
-                <img src="/img/abet-colaborative.png"
-                     class="card-img-top"
-                     alt="Folder con Evidencias">
+                <img src="/img/abet-colaborative.png" class="card-img-top" alt="Folder con Evidencias">
 
-                <a href="/teachers/abet/folders-evidences/new"
-                   class="btn btn-success btn-add">
+                <a href="/teachers/abet/folders-evidences/new" class="btn btn-success btn-add">
                   <i class="fa fa-plus"></i>
                 </a>
               </div>
@@ -117,12 +104,12 @@
       border-radius: 0px;
       overflow: hidden;
       transition: all .25s ease;
-      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
     }
 
     .abet-card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 12px 30px rgba(0,0,0,.15);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .15);
     }
 
     .abet-card .card-img-top {
@@ -141,7 +128,7 @@
       align-items: center;
       justify-content: center;
 
-      box-shadow: 0 4px 12px rgba(13,110,253,.35);
+      box-shadow: 0 4px 12px rgba(13, 110, 253, .35);
       font-size: 1.1rem;
     }
 
@@ -159,4 +146,4 @@
       margin-top: 5px;
     }
   </style>
-<% end %>
+  <% end %>

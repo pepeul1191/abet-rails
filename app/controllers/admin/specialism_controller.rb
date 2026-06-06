@@ -1,3 +1,4 @@
+# app/controllers/admin/specialism_controller.rb
 module Admin
   class SpecialismController < ApplicationController
     layout "dashboard"
@@ -7,7 +8,7 @@ module Admin
     end
     # Agrega aquí la lógica de tu controlador
     def index2
-      @nav_link = 'master-data'
+      @nav_link = "master-data"
       result = SpecialismService.fetch_all
 
       if result[:success]
@@ -17,12 +18,12 @@ module Admin
         flash.now[:alert] = result[:message]
       end
 
-      render 'admin/specialism/index'
+      render "admin/specialism/index"
     end
 
     def index
-      @nav_link = 'master-data'
-      
+      @nav_link = "master-data"
+
       # Obtener parámetros de la URL
       page = params[:page]&.to_i || 1
       per_page = params[:per_page]&.to_i || 10
@@ -53,13 +54,13 @@ module Admin
         flash.now[:alert] = result[:message]
       end
 
-      render 'admin/specialism/index'
+      render "admin/specialism/index"
     end
 
 
     def new
-      @nav_link = 'master-data'
-      render 'admin/specialism/new'
+      @nav_link = "master-data"
+      render "admin/specialism/new"
     end
 
     def create
@@ -74,12 +75,12 @@ module Admin
     end
 
     def edit
-      @nav_link = 'master-data'
+      @nav_link = "master-data"
       specialism_id = params[:id]
       resp = SpecialismService.fetch_one(specialism_id)
       if resp[:success]
         @specialism = resp[:data]
-        render 'admin/specialism/edit'
+        render "admin/specialism/edit"
       else
         flash[:alert] = resp[:message]
         redirect_to "/admin/specialism/new"
@@ -88,7 +89,7 @@ module Admin
 
     def update
       resp = SpecialismService.update(params[:id], specialism_params)
-      
+
       if resp[:success]
         redirect_to "/admin/specialism/#{params[:id]}/edit", notice: resp[:message]
       else
@@ -99,7 +100,7 @@ module Admin
 
     def delete
       resp = SpecialismService.delete(params[:id])
-      
+
       if resp[:success]
         redirect_to "/admin/specialism", notice: resp[:message]
       else
@@ -109,4 +110,3 @@ module Admin
     end
   end
 end
-
