@@ -11,6 +11,44 @@ module Teachers
     # Agrega aquí la lógica de tu controlador
     def index
       @nav_link = "abet"
+      @abet_options = [
+        {
+          title: "Carpetas de alumnos",
+          description: "Generación de carpetas con los nombres de los alumnos.",
+          image: "/img/abet-colaborative.png",
+          url: "/teachers/abet/folders/new",
+          button_class: "btn-primary",
+          icon: "fa-folder",
+          tags: [
+            "PDF evaluaciones",
+            "CSV alumnos"
+          ]
+        },
+        {
+          title: "Folder con Evidencias",
+          description: "Generación de folders con evidencias.",
+          image: "/img/abet-colaborative.png",
+          url: "/teachers/abet/folders-evidences/new",
+          button_class: "btn-primary",
+          icon: "fa-folder-open",
+          tags: [
+            "Rúbrica Word",
+            "CSV alumnos"
+          ]
+        },
+        {
+          title: "Partir PDF",
+          description: "Generación de pdfs por alumno a partir de PDF consolidado.",
+          image: "/img/abet-colaborative.png",
+          url: "/teachers/abet/split-pdf/new",
+          button_class: "btn-primary",
+          icon: "fa-folder-open",
+          tags: [
+            "PDF consolidado",
+            "CSV alumnos"
+          ]
+        }
+      ]
 
       page = params[:page]&.to_i || 1
       per_page = params[:per_page]&.to_i || 10
