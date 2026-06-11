@@ -1,3 +1,4 @@
+# app/controllers/teachers/abet_controller.rb
 require "csv"
 
 module Teachers
@@ -120,12 +121,22 @@ module Teachers
     def show_task
       @title = "Tareas ABET Ejecutadas"
       @nav_link = "abet"
-      @task = Task.find_by(id: params[:id])
-      if @task
+      
+      # Obtener el ID del usuario de la sesión
+      user_id = session[:user]&.dig('id')
+      
+      # Llamar al servicio para buscar la tarea
+      result = TaskService.find_task_by_id_for_user(params[:id], user_id)
+      
+      if result[:success]
+        @task = result[:data]
         render "teachers/abet/task"
+      elsif result[:message].include?("no encontrada")
+        render "errors/not_found", layout: "blank", status: :not_found
       else
-        flash[:alert] = "Tarea no encontrada"
-        redirect_to "/teachers/abet"
+        @error_message = result[:message]
+        @error_return_link = "/teachers/abet"
+        render "errors/error", layout: "blank", status: :not_found
       end
     end
 

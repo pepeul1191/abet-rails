@@ -3,6 +3,37 @@
 require "pathname"
 
 class TaskService < ApplicationService
+  def self.find_task_by_id_for_user(task_id, user_id)
+    # Validar parámetros
+    if task_id.blank?
+      return handle_error("ID de tarea no proporcionado")
+    end
+    
+    if user_id.blank?
+      return handle_error("Usuario no autenticado")
+    end
+    
+    # Buscar la tarea
+    task = Task.find_by(id: task_id)
+    
+    # Verificar si existe
+    if task.nil?
+      return handle_error("Tarea no encontrada")
+    end
+    
+    # Verificar si pertenece al usuario
+    if task.user_id != user_id
+      return handle_error("No tienes permiso para acceder a esta tarea")
+    end
+    
+    # Éxito - retornar la tarea
+    build_response(
+      data: task,
+      message: "Tarea encontrada exitosamente",
+      success: true
+    )
+  end
+
   def self.fetch_all(user_id:, page: 1, per_page: 10, search_query: nil, task_type_id: nil, start_date: nil, end_date: nil)
     puts "A -------------------------------------"
     puts 'user_id: #{user_id}'

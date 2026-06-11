@@ -1,0 +1,62 @@
+<%# app/views/errors/error.html.erb %>
+<% content_for :extra_css do %>
+  <style>
+    .error-container {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      flex-direction: column;
+      padding: 2rem;
+    }
+
+    .error-icon {
+      font-size: 5rem;
+      color: #dc3545;
+      margin-bottom: 1rem;
+    }
+
+    .error-code {
+      font-size: 6rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .error-message {
+      font-size: 1.25rem;
+      color: #6c757d;
+      margin-bottom: 2rem;
+      max-width: 500px;
+    }
+
+    .btn-home {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+    }
+  </style>
+<% end %>
+
+<div class="container">
+  <div class="error-container">
+    <div class="error-icon">
+      <i class="fa fa-exclamation-triangle"></i>
+    </div>
+    <div class="error-code">
+      Error
+    </div>
+    <h2 class="mb-3">¡Algo salió mal!</h2>
+    <p class="error-message">
+      <%= @error_message || "Ha ocurrido un error al procesar tu solicitud" %>
+    </p>
+    <% if @error_details && Rails.env.development? %>
+      <div class="alert alert-danger mt-3 w-100" style="max-width: 600px;">
+        <strong>Detalles:</strong> <%= @error_details %>
+      </div>
+    <% end %>
+    <a href="<%= @error_return_link %>" class="btn btn-primary btn-home">
+      <i class="fa fa-arrow-left me-2"></i> Volver a mis tareas
+    </a>
+  </div>
+</div>
