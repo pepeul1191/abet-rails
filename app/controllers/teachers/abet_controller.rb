@@ -17,7 +17,7 @@ module Teachers
         {
           title: "Carpetas de alumnos",
           description: "Generación de carpetas con los nombres de los alumnos.",
-          image: "/img/abet-colaborative.png",
+          image: "/img/abet-folders.png",
           url: "/teachers/abet/folders",
           button_class: "btn-primary",
           icon: "fa-folder",
@@ -29,7 +29,7 @@ module Teachers
         {
           title: "Folder con Evidencias",
           description: "Generación de folders con evidencias.",
-          image: "/img/abet-colaborative.png",
+          image: "/img/abet-folders-evidences.png",
           url: "/teachers/abet/folders-evidences",
           button_class: "btn-primary",
           icon: "fa-folder-open",
@@ -41,7 +41,7 @@ module Teachers
         {
           title: "Partir PDF",
           description: "Generación de pdfs por alumno a partir de PDF consolidado.",
-          image: "/img/abet-colaborative.png",
+          image: "/img/abet-split-pdf.png",
           url: "/teachers/abet/split-pdf",
           button_class: "btn-primary",
           icon: "fa-folder-open",
