@@ -10,6 +10,7 @@ module Teachers
 
     # Agrega aquí la lógica de tu controlador
     def index
+      @title = "ABET - Rubricas y Folders"
       @nav_link = "abet"
       @abet_options = [
         {
@@ -91,6 +92,7 @@ module Teachers
     end
 
     def folders_evidences
+      @title = "Evidencias ABET - Rubricas y Folders"
       @nav_link = "abet"
       @periods = PeriodService.fetch_all
       @task_types = TaskType.all.order(name: :asc)
@@ -98,6 +100,7 @@ module Teachers
     end
 
     def folders_evidences_generate
+      @title = "Generar Evidencias ABET"
       @nav_link = "abet"
       abet_resp = AbetService.generate_evidences(params)
       resp = TaskService.create(params, abet_resp, session)
@@ -115,6 +118,7 @@ module Teachers
     end
 
     def show_task
+      @title = "Tareas ABET Ejecutadas"
       @nav_link = "abet"
       @task = Task.find_by(id: params[:id])
       if @task
@@ -139,6 +143,7 @@ module Teachers
 
     def folders
       @nav_link = "abet"
+      @title = "Crear Folder de Alumnos"
       @periods = PeriodService.fetch_all
       @task_types = TaskType.all.order(name: :asc)
       render "teachers/abet/folders"
@@ -174,6 +179,7 @@ module Teachers
 
     def split_pdf
       @nav_link = "abet"
+      @title = "Partir PDF de Evidencias"
       @periods = PeriodService.fetch_all
       @task_types = TaskType.all.order(name: :asc)
       render "teachers/abet/split_pdf"
