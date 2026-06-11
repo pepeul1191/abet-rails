@@ -154,6 +154,31 @@ class SessionController < ApplicationController
     redirect_to sign_in_path
   end
 
+  def profile
+    @title = "Mi Perfil"
+    @nav_link = "profile"
+    
+    # Solo pasa datos no sensibles a la vista
+    @user_data = {
+      id: session[:user]&.dig('id'),
+      name: session[:user]&.dig('name'),
+      username: session[:user]&.dig('username'),
+      email: session[:user]&.dig('email'),
+      image_url: session[:user]&.dig('image_url'),
+      provider: session[:user]&.dig('provider')
+    }
+    @roles = session[:roles] || ['user']
+    @session_id = session.id.to_s
+    
+    # Verificar si hay usuario logueado
+    unless session[:user]
+      flash[:alert] = "Debes iniciar sesión para ver tu perfil"
+      redirect_to login_path and return
+    end
+    
+    render "session/profile", layout: "dashboard" 
+  end
+
   private
 
   def redirect_if_logged_in

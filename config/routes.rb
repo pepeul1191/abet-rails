@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   delete "sign-out", to: "session#sign_out", as: :sign_out_delete
   get "sign-out", to: "session#sign_out", as: :sign_out
   get "api/v1/session", to: "session#get_session", as: :get_session
+  get "profile", to: "session#profile", as: :profile
 
   ### oauth2 routes
   get "/auth/google_oauth2/callback", to: "session#create"

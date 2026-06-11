@@ -1,0 +1,275 @@
+<div class="container-fluid">
+
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Dashboard Sistema ABET</h1>
+    <a href="/teachers/abet/reports" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+      <i class="fa fa-download fa-sm text-white-50"></i> Generar Reporte
+    </a>
+  </div>
+
+  <!-- Content Row - Métricas -->
+  <div class="row">
+    
+    <!-- Tareas Generadas -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <a href="/teachers/abet" style="text-decoration: none;">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                  Tareas Generadas
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">24</div>
+              </div>
+              <div class="col-auto">
+                <i class="fa fa-tasks fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Carpetas Creadas -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <a href="/teachers/abet?type=folders" style="text-decoration: none;">
+        <div class="card border-left-success shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                  Carpetas Creadas
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">156</div>
+              </div>
+              <div class="col-auto">
+                <i class="fa fa-folder-open fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Evidencias Generadas -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <a href="/teachers/abet?type=evidences" style="text-decoration: none;">
+        <div class="card border-left-info shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                  Evidencias PDF
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">342</div>
+              </div>
+              <div class="col-auto">
+                <i class="fa fa-file-pdf fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Tareas Pendientes -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <a href="/teachers/abet?status=pending" style="text-decoration: none;">
+        <div class="card border-left-warning shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                  Tareas Pendientes
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">8</div>
+              </div>
+              <div class="col-auto">
+                <i class="fa fa-clock fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Content Row - Operaciones y Proyectos -->
+  <div class="row">
+
+    <!-- Operaciones Rápidas -->
+    <div class="col-xl-8 col-lg-7">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fa fa-cogs me-2"></i>
+            Operaciones Rápidas
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <a href="/teachers/abet/new?type=folders" class="text-decoration-none">
+                <div class="text-center p-3 border rounded">
+                  <i class="fa fa-folder-open fa-3x text-primary mb-2"></i>
+                  <div class="font-weight-bold">Generar Carpetas</div>
+                  <small class="text-muted">Crear estructura de carpetas</small>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-4 mb-3">
+              <a href="/teachers/abet/new?type=evidences" class="text-decoration-none">
+                <div class="text-center p-3 border rounded">
+                  <i class="fa fa-file-pdf fa-3x text-danger mb-2"></i>
+                  <div class="font-weight-bold">Generar Evidencias</div>
+                  <small class="text-muted">Word a PDF personalizado</small>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-4 mb-3">
+              <a href="/teachers/abet/new?type=split" class="text-decoration-none">
+                <div class="text-center p-3 border rounded">
+                  <i class="fa fa-cut fa-3x text-success mb-2"></i>
+                  <div class="font-weight-bold">Dividir PDF</div>
+                  <small class="text-muted">Por rangos de páginas</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tareas Recientes -->
+    <div class="col-xl-4 col-lg-5">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fa fa-history me-2"></i>
+            Tareas Recientes
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <a href="/teachers/abet/tasks/1" class="text-decoration-none">
+              <div class="font-weight-bold text-gray-800">Tarea ABET - Ingeniería</div>
+              <div class="small text-gray-600">Generación de carpetas</div>
+              <span class="badge bg-success">Completada</span>
+            </a>
+          </div>
+          <div class="mb-3">
+            <a href="/teachers/abet/tasks/2" class="text-decoration-none">
+              <div class="font-weight-bold text-gray-800">Evidencias - Curso IA</div>
+              <div class="small text-gray-600">Generación de PDFs</div>
+              <span class="badge bg-primary">En progreso</span>
+            </a>
+          </div>
+          <div class="mb-3">
+            <a href="/teachers/abet/tasks/3" class="text-decoration-none">
+              <div class="font-weight-bold text-gray-800">División de PDF final</div>
+              <div class="small text-gray-600">Por estudiantes</div>
+              <span class="badge bg-warning">Pendiente</span>
+            </a>
+          </div>
+          <div class="text-center mt-3">
+            <a href="/teachers/abet" class="btn btn-sm btn-primary">Ver todas</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Row - Guía Rápida y Ayuda -->
+  <div class="row">
+
+    <!-- Guía Rápida -->
+    <div class="col-lg-6 mb-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fa fa-question-circle me-2"></i>
+            Guía Rápida
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <div class="font-weight-bold text-gray-800">
+              <i class="fa fa-upload text-primary me-2"></i>
+              1. Prepara tu archivo CSV
+            </div>
+            <div class="small text-muted ps-4">
+              Asegúrate de tener las columnas: alumno, inicio, fin (para división de PDF)
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="font-weight-bold text-gray-800">
+              <i class="fa fa-cloud-upload-alt text-success me-2"></i>
+              2. Sube tus archivos
+            </div>
+            <div class="small text-muted ps-4">
+              CSV con datos y documento base (Word o PDF según la operación)
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="font-weight-bold text-gray-800">
+              <i class="fa fa-magic text-info me-2"></i>
+              3. Procesa y descarga
+            </div>
+            <div class="small text-muted ps-4">
+              El sistema generará un ZIP con todos los archivos procesados
+            </div>
+          </div>
+          <div class="text-center mt-3">
+            <a href="/teachers/abet/help" class="btn btn-sm btn-outline-primary">
+              <i class="fa fa-book me-1"></i> Ver documentación completa
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enlaces Útiles -->
+    <div class="col-lg-6 mb-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fa fa-link me-2"></i>
+            Enlaces Útiles
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="list-group">
+            <a href="/teachers/abet" class="list-group-item list-group-item-action">
+              <i class="fa fa-tasks me-2 text-primary"></i>
+              Mis Tareas ABET
+              <span class="badge bg-primary float-end">Ver</span>
+            </a>
+            <a href="/profile" class="list-group-item list-group-item-action">
+              <i class="fa fa-user-circle me-2 text-success"></i>
+              Mi Perfil
+              <span class="badge bg-success float-end">Editar</span>
+            </a>
+            <a href="/api/v1/session" class="list-group-item list-group-item-action" target="_blank">
+              <i class="fa fa-code me-2 text-info"></i>
+              API Session (JSON)
+              <span class="badge bg-info float-end">API</span>
+            </a>
+            <a href="/teachers/abet/reports" class="list-group-item list-group-item-action">
+              <i class="fa fa-chart-bar me-2 text-warning"></i>
+              Reportes y Estadísticas
+              <span class="badge bg-warning float-end">Nuevo</span>
+            </a>
+            <a href="/teachers/abet/help" class="list-group-item list-group-item-action">
+              <i class="fa fa-question-circle me-2 text-secondary"></i>
+              Centro de Ayuda
+              <span class="badge bg-secondary float-end">FAQ</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -24,11 +24,18 @@
       <!-- Usuario -->
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fa fa-user-circle"></i> 
-            invidado
+          <% if session[:user]&.dig('image_url') %>
+            <img src="<%= session[:user]['image_url'] %>" 
+                alt="<%= session[:user]['name'] %>" 
+                class="rounded-circle me-2" 
+                style="width: 32px; height: 32px; object-fit: cover;">
+          <% else %>
+            <i class="fa fa-user-circle me-2"></i>
+          <% end %>
+          <%= session[:user]&.dig('name') || session[:user]&.dig('username') || 'Invitado' %>
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="/api/v1/session">
+          <li><a class="dropdown-item" href="/profile">
             <i class="fa fa-user me-2"></i> Perfil
           </a></li>
           <li><hr class="dropdown-divider"></li>
