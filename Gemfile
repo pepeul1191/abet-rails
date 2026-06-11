@@ -60,3 +60,4 @@ gem 'omniauth-rails_csrf_protection'  # Protección CSRF para OmniAuth
 # Para generar documentos Word (.docx)
 gem 'rubyzip', '~> 2.3'
 gem 'libreconv', '~> 0.9'
+gem 'combine_pdf'

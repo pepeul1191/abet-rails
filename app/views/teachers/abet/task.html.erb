@@ -97,10 +97,10 @@
 
       <div class="card-body">
 
-        <% rows = JSON.parse(@task.data || "[]") %>
+        <%# Manejo seguro del JSON - siempre asegura que rows sea un array %>
+        <% rows = (JSON.parse(@task.data) rescue []) || [] %>
 
         <% if rows.any? %>
-
           <% headers = rows.first.keys %>
 
           <div class="table-responsive">
@@ -109,7 +109,7 @@
               <thead class="table-dark">
                 <tr>
                   <% headers.each do |header| %>
-                    <th><%= header.humanize %></th>
+                    <th><%= header.to_s.humanize %></th>
                   <% end %>
                 </tr>
               </thead>
@@ -128,7 +128,10 @@
           </div>
 
         <% else %>
-          <p class="text-muted">No hay datos disponibles.</p>
+          <div class="alert alert-info mb-0">
+            <i class="fa fa-info-circle me-2"></i>
+            No hay datos disponibles para esta tarea.
+          </div>
         <% end %>
 
       </div>

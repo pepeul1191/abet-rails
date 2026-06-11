@@ -1,0 +1,95 @@
+<main class="main-content">
+  <div class="container-fluid">
+
+    <h3 class="mb-4">
+      <a href="/teachers/abet">
+        <i class="fa fa-book me-2"></i>Evidencias ABET
+      </a>
+      /
+      Partir PDF de Evidencias
+    </h3>
+
+    <%= render 'partials/flash_messages' %>
+
+      <div class="card mb-4">
+
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fa fa-plus me-2"></i>
+            Partir un PDF de Evidencias en PDFs individuales por alumno para evidencias ABET
+          </h6>
+        </div>
+
+        <div class="card-body">
+
+          <form action="/teachers/abet/split-pdf" method="POST" enctype="multipart/form-data" class="row g-3">
+
+            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+            <!-- NAME -->
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text" name="name" class="form-control" maxlength="40" required>
+            </div>
+
+            <!-- TASK TYPE -->
+            <div class="col-md-3">
+              <label class="form-label">Tipo de Tarea</label>
+              <input type="hidden" name="task_type_id" value="3">
+              <select name="task_type_id" class="form-select" required disabled>
+                <% @task_types.each do |tt| %>
+                  <option value="<%= tt.id %>" <%='selected' if tt.id.to_s=='3' %>>
+                    <%= tt.name %>
+                  </option>
+                  <% end %>
+              </select>
+            </div>
+
+            <!-- PERIOD -->
+            <div class="col-md-3">
+              <label class="form-label">Periodo</label>
+              <select name="period_id" class="form-select" required>
+                <% @periods[:data][:periods].each do |p| %>
+                  <option value="<%= p.id %>">
+                    <%= p.name %>
+                  </option>
+                  <% end %>
+              </select>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="col-12">
+              <label class="form-label">Descripción</label>
+              <textarea name="description" class="form-control" rows="3"></textarea>
+            </div>
+
+            <!-- DATA FILE -->
+            <div class="col-md-6">
+              <label class="form-label">Archivo de Datos de los Alumnos (formato csv)</label>
+              <input type="file" name="data" class="form-control" accept=".csv" required>
+            </div>
+
+            <!-- DOCUMENT FILE -->
+            <div class="col-md-6">
+              <label class="form-label">PDF Consolidad de Envidencias (formato pdf)</label>
+              <input type="file" name="document" class="form-control" accept=".pdf" required>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-success">
+                <i class="fa fa-save me-2"></i>Guardar
+              </button>
+
+              <a href="/teachers/abet" class="btn btn-warning ms-2">
+                <i class="fa fa-times me-2"></i>Cancelar
+              </a>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+  </div>
+</main>

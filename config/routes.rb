@@ -75,9 +75,11 @@ Rails.application.routes.draw do
   namespace :teachers do
     get "/", to: "home#index"
     get "/abet", to: "abet#index"
-    get "/abet/folders-evidences/new", to: "abet#folders_evidences"
+    get "/abet/folders-evidences", to: "abet#folders_evidences"
     post "/abet/folders-evidences", to: "abet#folders_evidences_generate"
-    get "/abet/folders/new", to: "abet#folders"
+    get "/abet/folders", to: "abet#folders"
+    get "/abet/split-pdf", to: "abet#split_pdf"
+    post "/abet/split-pdf", to: "abet#split_pdf_generate"
     post "/abet/folders", to: "abet#folders_generate"
     get "/abet/tasks/:id", to: "abet#show_task"
     get "/abet/tasks/:id/evidences", to: "abet#download_evidences"

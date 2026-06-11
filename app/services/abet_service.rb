@@ -147,6 +147,80 @@ class AbetService < ApplicationService
     handle_error("Error al generar las evidencias: #{e.message}", e.backtrace)
   end
 
+  def self.generate_split_pdf(params)
+    # =========================
+    # 1. Leer parámetros básicos
+    # =========================
+    name = params[:name]
+    description = params[:description]
+    task_type_id = params[:task_type_id]
+    period_id = params[:period_id]
+
+    # =========================
+    # 2. Leer archivo CSV
+    # =========================
+    csv_file = params[:data]
+    students = []
+
+    if csv_file.present?
+      csv_content = csv_file.read
+
+      # IMPORTANTE: Probar diferentes codificaciones
+      csv_text = nil
+
+      # Intentar con UTF-8 primero
+      begin
+        csv_text = csv_content.dup.force_encoding("UTF-8")
+        unless csv_text.valid_encoding?
+          raise EncodingError
+        end
+      rescue
+        # Si falla, intentar con Windows-1252
+        begin
+          csv_text = csv_content.dup.force_encoding("Windows-1252").encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
+        rescue
+          # Último recurso: limpiar caracteres inválidos
+          csv_text = csv_content.dup.encode("UTF-8", "binary", invalid: :replace, undef: :replace, replace: "")
+        end
+      end
+
+      # Asegurarse de que los acentos se corrijan usando la función centralizada
+      csv_text = fix_encoding(csv_text)
+
+      # Usar símbolos como headers
+      csv = CSV.parse(csv_text, headers: true, header_converters: :symbol)
+      students = csv.map(&:to_h)
+    end
+
+    # =========================
+    # 3. Leer PDF consolidado y generar PDFs individuales por alumno
+    # =========================
+    document_file = params[:document]
+    document_path = nil
+
+    if document_file.present?
+      timestamp_dir = Rails.root.join("tmp", "abet", Time.now.to_i.to_s)
+      FileUtils.mkdir_p(timestamp_dir)
+
+      original_name = document_file.original_filename
+      full_path = timestamp_dir.join(original_name)
+
+      File.open(full_path, "wb") do |file|
+        file.write(document_file.read)
+      end
+
+      document_path = full_path.to_s
+
+      result = split_pdf_by_student(students, document_path, timestamp_dir)
+
+      result
+    else
+      build_response(success: false, message: "No se proporcionó el PDF consolidado")
+    end
+  rescue => e
+    handle_error("Error al generar los PDFs individuales: #{e.message}", e.backtrace)
+  end
+
   private
 
   def self.generate_student_folders(students, main_folder)
@@ -489,5 +563,188 @@ class AbetService < ApplicationService
 
     puts "   ✅ ZIP creado: #{File.basename(zip_path)}"
     puts "   📦 Tamaño: #{File.size(zip_path)} bytes"
+  end
+
+  def self.split_pdf_by_student(students, document_path, timestamp_dir)
+    require 'combine_pdf'
+    
+    main_folder = timestamp_dir
+
+    puts "\n🚀 Iniciando generación de PDFs individuales"
+    puts "📁 Carpeta principal: #{main_folder}"
+    puts "📄 PDF base: #{document_path}"
+    puts "=" * 60
+
+    successful = 0
+    failed = 0
+
+    # Verificar que el PDF base existe
+    unless File.exist?(document_path)
+      return build_response(
+        success: false,
+        message: "No se encontró el PDF base en: #{document_path}"
+      )
+    end
+
+    # Cargar el PDF fuente una sola vez (optimización)
+    begin
+      source_pdf = CombinePDF.load(document_path)
+      total_pages = source_pdf.pages.count
+      puts "📄 PDF cargado correctamente. Total de páginas: #{total_pages}"
+    rescue => e
+      return build_response(
+        success: false,
+        message: "Error al cargar el PDF: #{e.message}"
+      )
+    end
+
+    students.each do |student|
+      # Obtener datos del estudiante
+      alumno_name_raw = student[:alumno].to_s.strip
+      alumno_name = fix_encoding(alumno_name_raw)
+      
+      # Obtener página de inicio y fin
+      inicio_raw = student[:inicio].to_s.strip
+      fin_raw = student[:fin].to_s.strip
+      
+      # Validar que el nombre no esté vacío
+      if alumno_name.empty?
+        puts "\n⚠️  Nombre vacío encontrado, omitiendo..."
+        failed += 1
+        next
+      end
+      
+      # Validar que las páginas sean números
+      if inicio_raw.empty? || fin_raw.empty?
+        puts "\n⚠️  Páginas no especificadas para: #{alumno_name}, omitiendo..."
+        failed += 1
+        next
+      end
+      
+      begin
+        inicio = Integer(inicio_raw)
+        fin = Integer(fin_raw)
+      rescue ArgumentError
+        puts "\n⚠️  Páginas inválidas para #{alumno_name}: inicio='#{inicio_raw}', fin='#{fin_raw}', omitiendo..."
+        failed += 1
+        next
+      end
+      
+      # Validar rangos de páginas
+      if inicio < 1 || inicio > total_pages
+        puts "\n⚠️  Página de inicio (#{inicio}) fuera de rango (1-#{total_pages}) para #{alumno_name}, omitiendo..."
+        failed += 1
+        next
+      end
+      
+      if fin < inicio || fin > total_pages
+        puts "\n⚠️  Rango de páginas inválido (#{inicio}-#{fin}) para #{alumno_name}, omitiendo..."
+        failed += 1
+        next
+      end
+      
+      # Sanitizar nombre para el archivo
+      file_name = sanitize_filename(alumno_name)
+      pdf_path = File.join(main_folder, "#{file_name}.pdf")
+      
+      puts "\n📄 Procesando: #{alumno_name}"
+      puts "   📄 Archivo: #{file_name}.pdf"
+      puts "   📄 Páginas: #{inicio} a #{fin} (total: #{fin - inicio + 1} páginas)"
+      
+      begin
+        # Crear nuevo PDF y agregar las páginas del rango
+        pdf_pages = CombinePDF.new
+        
+        # Las páginas en CombinePDF son 0-indexed, por eso restamos 1
+        (inicio - 1..fin - 1).each do |page_num|
+          pdf_pages << source_pdf.pages[page_num]
+        end
+        
+        # Guardar el nuevo PDF
+        pdf_pages.save(pdf_path)
+        
+        # Verificar que se creó correctamente
+        if File.exist?(pdf_path) && File.size(pdf_path) > 0
+          puts "   ✅ PDF generado exitosamente (tamaño: #{File.size(pdf_path)} bytes)"
+          successful += 1
+        else
+          puts "   ❌ Error: El archivo PDF no se generó correctamente"
+          failed += 1
+        end
+        
+      rescue => e
+        puts "   ❌ Error: #{e.message}"
+        puts "   📚 Stack trace: #{e.backtrace.first(3).join(' -> ')}" if Rails.env.development?
+        failed += 1
+      end
+    end
+    
+    puts "\n" + "=" * 60
+    puts "✨ Proceso completado!"
+    puts "📊 Resumen:"
+    puts "   ✅ Exitosos: #{successful}"
+    puts "   ❌ Fallidos: #{failed}"
+    puts "📁 Ubicación: #{main_folder}"
+    puts "=" * 60
+    
+    # Comprimir resultados si hay al menos un éxito
+    if successful > 0
+      puts "\n🗜️  Comprimiendo carpeta..."
+      zip_path = File.join(main_folder, "pdfs_individuales.zip")
+      
+      begin
+        # Comprimir solo los PDFs generados, no toda la carpeta
+        Zip::File.open(zip_path, create: true) do |zipfile|
+          Dir.glob(File.join(main_folder, "*.pdf")).each do |pdf_file|
+            zipfile.add(File.basename(pdf_file), pdf_file)
+          end
+        end
+        
+        puts "\n" + "=" * 60
+        puts "✅ ¡PROCESO COMPLETADO!"
+        puts "📦 Archivo ZIP generado: #{zip_path}"
+        puts "📏 Tamaño: #{File.size(zip_path)} bytes"
+        puts "📄 Total de PDFs generados: #{successful}"
+        puts "=" * 60
+        
+        build_response(
+          success: true,
+          message: "PDFs individuales generados correctamente",
+          data: {
+            zip_path: zip_path,
+            folder: main_folder.to_s,
+            total_pages: total_pages,
+            total_students: students.count,
+            successful: successful,
+            failed: failed,
+            students: students,
+            pdf_files: Dir.glob(File.join(main_folder, "*.pdf")).map { |f| File.basename(f) }
+          }
+        )
+      rescue => e
+        puts "❌ Error al comprimir: #{e.message}"
+        
+        build_response(
+          success: false,
+          message: "Error al comprimir: #{e.message}",
+          data: {
+            folder: main_folder.to_s,
+            successful: successful,
+            failed: failed
+          }
+        )
+      end
+    else
+      build_response(
+        success: false,
+        message: "No se pudo generar ningún PDF. Verifica que los rangos de páginas sean correctos.",
+        data: {
+          total_students: students.count,
+          total_pages: total_pages,
+          failed: failed,
+          errors: "Los rangos de páginas deben estar entre 1 y #{total_pages}"
+        }
+      )
+    end
   end
 end

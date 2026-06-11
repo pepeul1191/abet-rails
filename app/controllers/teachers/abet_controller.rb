@@ -16,7 +16,7 @@ module Teachers
           title: "Carpetas de alumnos",
           description: "Generación de carpetas con los nombres de los alumnos.",
           image: "/img/abet-colaborative.png",
-          url: "/teachers/abet/folders/new",
+          url: "/teachers/abet/folders",
           button_class: "btn-primary",
           icon: "fa-folder",
           tags: [
@@ -28,7 +28,7 @@ module Teachers
           title: "Folder con Evidencias",
           description: "Generación de folders con evidencias.",
           image: "/img/abet-colaborative.png",
-          url: "/teachers/abet/folders-evidences/new",
+          url: "/teachers/abet/folders-evidences",
           button_class: "btn-primary",
           icon: "fa-folder-open",
           tags: [
@@ -40,7 +40,7 @@ module Teachers
           title: "Partir PDF",
           description: "Generación de pdfs por alumno a partir de PDF consolidado.",
           image: "/img/abet-colaborative.png",
-          url: "/teachers/abet/split-pdf/new",
+          url: "/teachers/abet/split-pdf",
           button_class: "btn-primary",
           icon: "fa-folder-open",
           tags: [
@@ -136,6 +136,7 @@ module Teachers
         redirect_to "/teachers/abet/tasks/#{params[:id]}"
       end
     end
+
     def folders
       @nav_link = "abet"
       @periods = PeriodService.fetch_all
@@ -168,6 +169,30 @@ module Teachers
       else
         flash[:alert] = resp[:message]
         redirect_to "/teachers/abet"
+      end
+    end
+
+    def split_pdf
+      @nav_link = "abet"
+      @periods = PeriodService.fetch_all
+      @task_types = TaskType.all.order(name: :asc)
+      render "teachers/abet/split_pdf"
+    end
+
+    def split_pdf_generate
+      @nav_link = "abet"
+      abet_resp = AbetService.generate_split_pdf(params)
+      resp = TaskService.create(params, abet_resp, session)
+
+      if resp[:success]
+        task = resp[:data]
+        redirect_to "/teachers/abet/tasks/#{task.id}"
+      else
+        @nav_link = "abet"
+        @periods = PeriodService.fetch_all
+        @task_types = TaskType.all.order(name: :asc)
+        flash[:alert] = resp[:message]
+        render "teachers/abet/split_pdf"
       end
     end
   end
