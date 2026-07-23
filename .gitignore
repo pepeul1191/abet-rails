@@ -41,3 +41,7 @@ node_modules
 
 scripts/tmp
 scripts/.~lock.*
+
+scripts/*.pdf
+scripts/venv
+scripts/*/*
